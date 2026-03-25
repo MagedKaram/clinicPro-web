@@ -1,0 +1,149 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+
+export type UseVisitsRealtimeOptions = {
+  day: string;
+  enabled?: boolean;
+  onChange: () => void;
+  debounceMs?: number;
+  fallbackPollMs?: number;
+};
+
+function todayISODateClient(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getVisitDateFromRow(row: unknown): string {
+  if (!row || typeof row !== "object") return "";
+  if (!("visit_date" in row)) return "";
+  const value = (row as { visit_date?: unknown }).visit_date;
+  if (typeof value === "string") return value;
+  return value == null ? "" : String(value);
+}
+
+export function useVisitsRealtime({
+  day,
+  enabled = true,
+  onChange,
+  debounceMs = 250,
+  // True realtime by default: no polling fallback unless explicitly enabled.
+  fallbackPollMs = 0,
+}: UseVisitsRealtimeOptions) {
+  const onChangeRef = useRef(onChange);
+  const debounceMsRef = useRef(debounceMs);
+  const pendingRefreshRef = useRef(false);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  useEffect(() => {
+    debounceMsRef.current = debounceMs;
+  }, [debounceMs]);
+
+  useEffect(() => {
+    if (!enabled) return;
+
+    const supabase = createSupabaseBrowserClient();
+
+    let timeoutId: number | null = null;
+    const trigger = () => {
+      if (timeoutId) window.clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => {
+        onChangeRef.current();
+      }, debounceMsRef.current);
+    };
+
+    // NOTE:
+    // We intentionally subscribe WITHOUT a server-side filter.
+    // Filtering by a non-updated column can miss UPDATE events depending on replica identity.
+    // We do a lightweight client-side check instead.
+    const effectiveDay = day || todayISODateClient();
+
+    let subscribed = false;
+    let pollId: number | null = null;
+
+    const onVisibilityChange = () => {
+      if (!document.hidden && pendingRefreshRef.current) {
+        pendingRefreshRef.current = false;
+        trigger();
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    const channel = supabase
+      .channel(`visits-${effectiveDay}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "visits",
+        },
+        (
+          payload: RealtimePostgresChangesPayload<{
+            visit_date?: string | null;
+          }>,
+        ) => {
+          if (document.hidden) {
+            pendingRefreshRef.current = true;
+            return;
+          }
+
+          const rowDay =
+            getVisitDateFromRow(payload.new) ||
+            getVisitDateFromRow(payload.old);
+
+          // If we can detect the day, only refresh when it matches.
+          // If not, refresh anyway (safe; server action filters by day).
+          if (!rowDay || rowDay === effectiveDay) {
+            trigger();
+          }
+        },
+      )
+      .subscribe((status: string) => {
+        if (status === "SUBSCRIBED") {
+          subscribed = true;
+          trigger();
+        }
+
+        if (
+          status === "CHANNEL_ERROR" ||
+          status === "TIMED_OUT" ||
+          status === "CLOSED"
+        ) {
+          subscribed = false;
+          pendingRefreshRef.current = true;
+
+          if (process.env.NODE_ENV !== "production") {
+            console.warn("[useVisitsRealtime] channel status:", status);
+          }
+        }
+      });
+
+    // Fallback polling: if realtime isn't subscribed, still refresh periodically.
+    // This avoids manual refresh when realtime is misconfigured.
+    if (fallbackPollMs > 0) {
+      pollId = window.setInterval(
+        () => {
+          if (document.hidden) return;
+          if (subscribed) return;
+          trigger();
+        },
+        Math.max(2000, fallbackPollMs),
+      );
+    }
+
+    return () => {
+      if (timeoutId) window.clearTimeout(timeoutId);
+      if (pollId) window.clearInterval(pollId);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      supabase.removeChannel(channel);
+    };
+  }, [day, enabled, fallbackPollMs]);
+}

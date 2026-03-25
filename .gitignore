@@ -1,0 +1,19 @@
+# Workspace/editor
+.vscode/
+
+# OS
+.DS_Store
+
+# Env files
+.env*
+
+# Next.js (web app)
+web/node_modules/
+web/.next/
+web/out/
+web/build/
+web/.vercel/
+
+# Logs
+*.log
+*.pem

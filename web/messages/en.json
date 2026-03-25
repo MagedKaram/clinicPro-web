@@ -1,0 +1,214 @@
+{
+  "reception": {
+    "title": {
+      "default": "🏥 Reception",
+      "withClinic": "🏥 {clinicName}"
+    },
+    "nav": {
+      "reports": "📊 Reports",
+      "display": "📺 Waiting Display",
+      "doctor": "👨‍⚕️ Doctor",
+      "endDay": "🌙 End Day",
+      "logout": "Logout"
+    },
+    "tabs": {
+      "queue": "📋 Registration",
+      "report": "📊 Daily Report",
+      "settings": "⚙️ Settings"
+    },
+    "balanceBar": {
+      "title": "💰 Today's balance:",
+      "total": "Total",
+      "paid": "Paid",
+      "remaining": "Remaining",
+      "refresh": "🔄 Refresh",
+      "currency": "EGP"
+    },
+    "queue": {
+      "title": "Queue",
+      "current": "Current",
+      "waiting": "Waiting",
+      "todayBilling": "Today's billing",
+      "empty": "No patients right now",
+      "serving": "Now"
+    },
+    "register": {
+      "title": "Register Patient",
+      "search": {
+        "label": "Search existing patient",
+        "placeholder": "Search by name or phone...",
+        "badge": "Existing",
+        "hint": "Or enter a new patient's details below"
+      },
+      "selected": {
+        "cancel": "✕ Clear"
+      },
+      "fields": {
+        "fullName": "Full name *",
+        "fullNamePlaceholder": "Patient full name",
+        "phone": "Phone",
+        "phonePlaceholder": "01xxxxxxxxx",
+        "address": "Address",
+        "addressPlaceholder": "City / Area"
+      },
+      "visitType": {
+        "label": "Visit type",
+        "new": "🆕 New",
+        "followup": "🔄 Follow-up",
+        "newShort": "New",
+        "followupShort": "Follow-up"
+      },
+      "submit": "✅ Register & Issue Ticket"
+    },
+    "ticket": {
+      "label": "Ticket",
+      "waitingAhead": "{count} ahead of you",
+      "print": "🖨️ Print"
+    },
+    "report": {
+      "refresh": "🔄 Refresh",
+      "print": "🖨️ Print",
+      "summary": {
+        "totalPatients": "Total patients",
+        "new": "New",
+        "followup": "Follow-up",
+        "paid": "Collected"
+      },
+      "title": "Today's report",
+      "table": {
+        "noData": "No data",
+        "colIndex": "#",
+        "colName": "Name",
+        "colType": "Type",
+        "colDiagnosis": "Diagnosis",
+        "colPrice": "Price",
+        "colPaid": "Paid",
+        "colRemaining": "Remaining"
+      }
+    },
+    "settings": {
+      "title": "Clinic settings",
+      "fields": {
+        "clinicName": "Clinic name",
+        "doctorName": "Doctor name",
+        "phone": "Phone",
+        "address": "Address",
+        "priceNew": "New visit price (EGP)",
+        "priceFollowup": "Follow-up price (EGP)"
+      },
+      "save": "💾 Save",
+      "saved": "✅ Saved!"
+    },
+    "alerts": {
+      "missingName": "Please enter the full name",
+      "endDayConfirm": "⚠️ Are you sure you want to end the day?\n\nThis will:\n• Clear the current queue\n• Reset ticket numbers\n• Start fresh tomorrow\n\nMake sure all payments are recorded before ending the day."
+    }
+  },
+  "common": {
+    "comingSoon": "Coming soon",
+    "pageTitles": {
+      "display": "Display",
+      "doctor": "Doctor",
+      "reports": "Reports",
+      "login": "Login"
+    }
+  },
+  "display": {
+    "title": "Waiting Display",
+    "comingSoon": "Coming soon",
+    "topbar": {
+      "systemName": "Smart Queue System"
+    },
+    "nowServing": {
+      "label": "Now serving",
+      "waitingFirst": "Waiting for the first patient",
+      "yourTurn": "Your turn now"
+    },
+    "waiting": {
+      "title": "Waiting",
+      "subtitle": "Please wait until your number appears",
+      "empty": "No patients waiting right now",
+      "next": "Next"
+    },
+    "visitType": {
+      "new": "🆕 New",
+      "followup": "🔄 Follow-up"
+    },
+    "ticker": {
+      "text": "Please watch your number on the screen • Make sure you registered at reception • Wishing you a speedy recovery • Please follow the queue • Thank you"
+    }
+  },
+  "doctor": {
+    "comingSoon": "Coming soon",
+    "title": {
+      "default": "👨‍⚕️ Doctor Dashboard",
+      "withDoctor": "👨‍⚕️ Dr. {doctorName}"
+    },
+    "nav": {
+      "reception": "Reception",
+      "display": "Waiting Display",
+      "endDay": "🌙 End Day",
+      "logout": "Logout"
+    },
+    "tabs": {
+      "exam": "🏥 Exam",
+      "search": "🔍 Patient Search",
+      "report": "📊 Report"
+    },
+    "current": {
+      "title": "Current patient"
+    },
+    "queue": {
+      "title": "Queue",
+      "empty": "No patients waiting",
+      "next": "Next"
+    },
+    "visitType": {
+      "new": "🆕 New",
+      "followup": "🔄 Follow-up"
+    },
+    "actions": {
+      "callNext": "Call next ←",
+      "finish": "✅ Finish visit & send billing"
+    },
+    "stats": {
+      "serving": "Serving",
+      "waiting": "Waiting",
+      "next": "Next"
+    },
+    "empty": {
+      "noCurrent": "No current patient — click Call next"
+    },
+    "form": {
+      "title": "Visit details",
+      "diagnosis": "Diagnosis",
+      "diagnosisPlaceholder": "Write diagnosis here...",
+      "prescription": "Prescription",
+      "prescriptionPlaceholder": "Write prescription here...",
+      "notes": "Notes",
+      "notesPlaceholder": "Write any additional notes...",
+      "price": "Price",
+      "pricePlaceholder": "0",
+      "extraCharge": "Extra charge",
+      "extraChargePlaceholder": "0",
+      "addExtra": "Add",
+      "currency": "EGP"
+    },
+    "search": {
+      "title": "Search patient",
+      "placeholder": "Search by name or phone...",
+      "empty": "No results"
+    },
+    "alerts": {
+      "endDayConfirm": "⚠️ Are you sure you want to end the day?\n\nThis will clear the queue and start fresh."
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "comingSoon": "Coming soon"
+  },
+  "login": {
+    "title": "Login",
+    "comingSoon": "Coming soon"
+  }
+}

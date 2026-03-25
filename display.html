@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>شاشة الانتظار</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+    <style>
+      :root {
+        --bg: #050e1a;
+        --accent: #00e5cc;
+        --accent2: #f59e0b;
+        --text: #fff;
+        --muted: rgba(255, 255, 255, 0.45);
+        --card: rgba(255, 255, 255, 0.05);
+        --border: rgba(255, 255, 255, 0.08);
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Cairo", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 80% 50% at 50% -20%,
+            rgba(0, 229, 204, 0.08) 0%,
+            transparent 70%
+          ),
+          radial-gradient(
+            ellipse 50% 30% at 80% 80%,
+            rgba(245, 158, 11, 0.05) 0%,
+            transparent 60%
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.03) 1px,
+          transparent 1px
+        );
+        background-size: 40px 40px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .topbar {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 44px;
+        background: rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(10px);
+      }
+      .clinic-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        color: rgba(255, 255, 255, 0.9);
+      }
+      .clinic-name .dot {
+        width: 9px;
+        height: 9px;
+        background: var(--accent);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--accent);
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.5;
+          transform: scale(0.85);
+        }
+      }
+      .topbar-clock {
+        font-size: 1.7rem;
+        font-weight: 900;
+        color: var(--accent);
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 2px;
+      }
+      .topbar-date {
+        font-size: 0.85rem;
+        color: var(--muted);
+        text-align: left;
+      }
+
+      .main-content {
+        position: relative;
+        z-index: 1;
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+      }
+
+      /* Current */
+      .current-panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px 44px;
+        border-left: 1px solid var(--border);
+        position: relative;
+      }
+      .current-panel::before {
+        content: "";
+        position: absolute;
+        inset: 40px;
+        border-radius: 30px;
+        background: radial-gradient(
+          ellipse at center,
+          rgba(0, 229, 204, 0.06) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .now-serving-label {
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        color: var(--muted);
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .now-serving-label .live-dot {
+        width: 8px;
+        height: 8px;
+        background: #ff4444;
+        border-radius: 50%;
+        animation: blink 1s infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+      .current-number {
+        font-size: min(20vw, 16rem);
+        font-weight: 900;
+        line-height: 0.85;
+        color: var(--accent);
+        text-shadow:
+          0 0 60px rgba(0, 229, 204, 0.4),
+          0 0 120px rgba(0, 229, 204, 0.15);
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .current-number.dash {
+        color: rgba(0, 229, 204, 0.2);
+        text-shadow: none;
+        font-size: min(13vw, 10rem);
+      }
+      .current-label {
+        font-size: 0.95rem;
+        color: var(--muted);
+        margin-top: 14px;
+        text-align: center;
+      }
+
+      /* Waiting */
+      .waiting-panel {
+        display: flex;
+        flex-direction: column;
+        padding: 36px 44px;
+      }
+      .waiting-header {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        margin-bottom: 28px;
+      }
+      .waiting-count-big {
+        font-size: 4.5rem;
+        font-weight: 900;
+        color: var(--accent2);
+        line-height: 1;
+      }
+      .waiting-header-text {
+        font-size: 1rem;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+      .waiting-header-text strong {
+        color: rgba(255, 255, 255, 0.8);
+        display: block;
+        font-size: 1.2rem;
+      }
+      .waiting-list {
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+        flex: 1;
+        overflow: hidden;
+      }
+      .waiting-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 18px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 13px;
+        transition: all 0.3s;
+        animation: itemIn 0.4s ease;
+      }
+      @keyframes itemIn {
+        from {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .waiting-item:first-child {
+        border-color: rgba(0, 229, 204, 0.25);
+        background: rgba(0, 229, 204, 0.06);
+      }
+      .w-num {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        font-weight: 900;
+        color: rgba(255, 255, 255, 0.7);
+        flex-shrink: 0;
+      }
+      .waiting-item:first-child .w-num {
+        background: rgba(0, 229, 204, 0.15);
+        color: var(--accent);
+      }
+      .w-info {
+        flex: 1;
+      }
+      .w-name {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.9);
+      }
+      .w-sub {
+        font-size: 0.78rem;
+        color: var(--muted);
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .next-tag {
+        font-size: 0.7rem;
+        padding: 2px 9px;
+        background: rgba(0, 229, 204, 0.15);
+        color: var(--accent);
+        border-radius: 20px;
+        font-weight: 700;
+      }
+      .empty-display {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px;
+        gap: 14px;
+        text-align: center;
+      }
+      .empty-display .big {
+        font-size: 4.5rem;
+        opacity: 0.2;
+      }
+      .empty-display p {
+        font-size: 1.1rem;
+        color: var(--muted);
+      }
+
+      /* ── TICKER FIX ── */
+      .ticker {
+        position: relative;
+        z-index: 1;
+        background: rgba(0, 229, 204, 0.08);
+        border-top: 1px solid rgba(0, 229, 204, 0.15);
+        padding: 10px 0;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      .ticker-label {
+        flex-shrink: 0;
+        color: var(--accent);
+        font-weight: 700;
+        font-size: 0.82rem;
+        letter-spacing: 1px;
+        padding: 0 16px;
+        background: rgba(0, 229, 204, 0.15);
+        border-left: 2px solid var(--accent);
+        margin-left: 16px; /* RTL: margin-left = space on right side */
+        height: 100%;
+        display: flex;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+      }
+      .ticker-track {
+        display: flex;
+        animation: tickerMove 28s linear infinite;
+      }
+      .ticker-text {
+        font-size: 0.88rem;
+        color: var(--muted);
+        padding: 0 40px;
+        flex-shrink: 0;
+      }
+      @keyframes tickerMove {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+
+      /* Announce overlay */
+      .announce-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.88);
+        opacity: 0;
+        pointer-events: none;
+      }
+      .announce-overlay.show {
+        animation: announceAnim 15s ease forwards;
+      }
+      @keyframes announceAnim {
+        0% {
+          opacity: 0;
+        }
+        5% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+      .announce-box {
+        text-align: center;
+        animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      @keyframes scaleIn {
+        from {
+          transform: scale(0.5);
+        }
+        to {
+          transform: scale(1);
+        }
+      }
+      .announce-label {
+        font-size: 1.4rem;
+        color: var(--muted);
+        letter-spacing: 4px;
+        text-transform: uppercase;
+      }
+      .announce-number {
+        font-size: min(35vw, 18rem);
+        font-weight: 900;
+        line-height: 0.85;
+        color: var(--accent);
+        text-shadow:
+          0 0 80px rgba(0, 229, 204, 0.6),
+          0 0 160px rgba(0, 229, 204, 0.3);
+      }
+      .announce-name {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #fff;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="announce-overlay" id="announce-overlay">
+      <div class="announce-box">
+        <div class="announce-label">دورك الآن</div>
+        <div class="announce-number" id="announce-num">0</div>
+        <div class="announce-name" id="announce-name"></div>
+      </div>
+    </div>
+
+    <div class="topbar">
+      <div class="clinic-name">
+        <div class="dot"></div>
+        <span id="clinic-name-display">نظام الانتظار الذكي</span>
+      </div>
+      <div class="topbar-clock" id="clock">--:--</div>
+      <div class="topbar-date" id="date-display"></div>
+    </div>
+
+    <div class="main-content">
+      <div class="current-panel">
+        <div class="now-serving-label">
+          <div class="live-dot"></div>
+          يُخدم الآن
+        </div>
+        <div class="current-number dash" id="current-num">—</div>
+        <div class="current-label" id="current-sub">في انتظار أول مريض</div>
+      </div>
+      <div class="waiting-panel">
+        <div class="waiting-header">
+          <div class="waiting-count-big" id="wait-count">0</div>
+          <div class="waiting-header-text">
+            <strong>في الانتظار</strong>
+            يرجى الانتظار حتى ظهور رقمك
+          </div>
+        </div>
+        <div class="waiting-list" id="waiting-list">
+          <div class="empty-display">
+            <div class="big">🏥</div>
+            <p>لا يوجد مرضى في الانتظار حالياً</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ticker: النص مكرر مرتين عشان الـ loop يبان smooth -->
+    <div class="ticker">
+      <div class="ticker-label">📢</div>
+      <div class="ticker-track">
+        <span class="ticker-text"
+          >يرجى الانتباه لرقمك على الشاشة &nbsp;•&nbsp; تأكد من تسجيل بياناتك
+          عند الاستقبال &nbsp;•&nbsp; نتمنى لك سرعة الشفاء &nbsp;•&nbsp; يرجى
+          الالتزام بالدور &nbsp;•&nbsp; شكراً لحضوركم
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span
+        >
+        <span class="ticker-text"
+          >يرجى الانتباه لرقمك على الشاشة &nbsp;•&nbsp; تأكد من تسجيل بياناتك
+          عند الاستقبال &nbsp;•&nbsp; نتمنى لك سرعة الشفاء &nbsp;•&nbsp; يرجى
+          الالتزام بالدور &nbsp;•&nbsp; شكراً لحضوركم
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span
+        >
+      </div>
+    </div>
+
+    <script>
+      const socket = io();
+
+      // Clock
+      function updateTime() {
+        const now = new Date();
+        document.getElementById("clock").textContent = now.toLocaleTimeString(
+          "ar-EG",
+          { hour: "2-digit", minute: "2-digit", second: "2-digit" },
+        );
+        document.getElementById("date-display").textContent =
+          now.toLocaleDateString("ar-EG", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+      }
+      setInterval(updateTime, 1000);
+      updateTime();
+
+      // Load clinic name
+      fetch("/api/settings")
+        .then((r) => r.json())
+        .then((s) => {
+          if (s.clinic_name)
+            document.getElementById("clinic-name-display").textContent =
+              "🏥 " + s.clinic_name;
+        });
+
+      socket.on("state_update", function (s) {
+        const numEl = document.getElementById("current-num");
+        const subEl = document.getElementById("current-sub");
+
+        if (s.current) {
+          numEl.textContent = s.current;
+          numEl.classList.remove("dash");
+          const serving = s.queue.find((p) => p.status === "serving");
+          subEl.textContent = serving ? serving.name : "";
+        } else {
+          numEl.textContent = "—";
+          numEl.classList.add("dash");
+          subEl.textContent = "في انتظار أول مريض";
+        }
+
+        document.getElementById("wait-count").textContent = s.waiting_count;
+
+        const patients = s.waiting_patients.slice(0, 6);
+        const waitList = document.getElementById("waiting-list");
+        if (!patients.length) {
+          waitList.innerHTML =
+            '<div class="empty-display"><div class="big">🎉</div><p>لا يوجد مرضى في الانتظار حالياً</p></div>';
+          return;
+        }
+        waitList.innerHTML = patients
+          .map(
+            (p, i) => `
+    <div class="waiting-item">
+      <div class="w-num">${p.ticket}</div>
+      <div class="w-info">
+        <div class="w-name">${p.name}</div>
+        <div class="w-sub">
+          <span>${p.type === "new" ? "🆕 كشف جديد" : "🔄 متابعة"}</span>
+          <span>•</span><span>${p.time}</span>
+          ${i === 0 ? '<span class="next-tag">التالي ▶</span>' : ""}
+        </div>
+      </div>
+    </div>`,
+          )
+          .join("");
+      });
+
+      socket.on("new_patient_called", function (patient) {
+        document.getElementById("announce-num").textContent = patient.ticket;
+        document.getElementById("announce-name").textContent = patient.name;
+        const overlay = document.getElementById("announce-overlay");
+        overlay.classList.remove("show");
+        void overlay.offsetWidth;
+        overlay.classList.add("show");
+        setTimeout(() => overlay.classList.remove("show"), 15000);
+
+        // Beep
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          [0, 0.22, 0.44].forEach((t) => {
+            const osc = ctx.createOscillator(),
+              gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.value = 880;
+            gain.gain.setValueAtTime(0.3, ctx.currentTime + t);
+            gain.gain.exponentialRampToValueAtTime(
+              0.001,
+              ctx.currentTime + t + 0.18,
+            );
+            osc.start(ctx.currentTime + t);
+            osc.stop(ctx.currentTime + t + 0.18);
+          });
+        } catch (e) {}
+      });
+    </script>
+  </body>
+</html>

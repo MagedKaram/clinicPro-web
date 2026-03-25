@@ -1,0 +1,1741 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>لوحة الدكتور</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+    <style>
+      :root {
+        --bg: #0d1f33;
+        --card: #132840;
+        --card2: #1a3455;
+        --text: #e8f0f8;
+        --muted: #6b8aaa;
+        --border: #1e3d5c;
+        --accent: #00c9b1;
+        --accent2: #f59e0b;
+        --new: #3b9eed;
+        --followup: #00c9b1;
+        --danger: #ef5350;
+        --success: #66bb6a;
+        --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Cairo", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        background: var(--card);
+        padding: 14px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--border);
+      }
+      header h1 {
+        font-size: 1.2rem;
+        font-weight: 700;
+      }
+      .hright {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+      }
+      .clock {
+        font-size: 1.4rem;
+        font-weight: 900;
+        color: var(--accent);
+        font-variant-numeric: tabular-nums;
+      }
+      .nav-link {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.82rem;
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        transition: 0.2s;
+      }
+      .nav-link:hover {
+        color: var(--text);
+        border-color: var(--muted);
+      }
+      .logout-btn {
+        background: transparent;
+        color: var(--muted);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        font-family: "Cairo", sans-serif;
+        font-size: 0.82rem;
+        padding: 5px 12px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .logout-btn:hover {
+        color: #ef9a9a;
+        border-color: #ef9a9a;
+      }
+
+      .tabs {
+        background: var(--card);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        padding: 0 28px;
+      }
+      .tab {
+        padding: 13px 20px;
+        font-family: "Cairo", sans-serif;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--muted);
+        border: none;
+        background: none;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -1px;
+        transition: 0.2s;
+      }
+      .tab.active {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
+      }
+
+      .panel {
+        display: none;
+        padding: 22px 28px;
+      }
+      .panel.active {
+        display: flex;
+        gap: 22px;
+      }
+      .panel.col.active {
+        flex-direction: column;
+        max-width: 900px;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      /* Cards */
+      .card {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 22px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+      }
+      .card-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      /* Forms */
+      .form-group {
+        margin-bottom: 14px;
+      }
+      label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--muted);
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      textarea,
+      input[type="text"],
+      input[type="number"] {
+        width: 100%;
+        padding: 10px 13px;
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        font-family: "Cairo", sans-serif;
+        font-size: 0.9rem;
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.05);
+        transition: 0.2s;
+        outline: none;
+        resize: vertical;
+      }
+      textarea:focus,
+      input:focus {
+        border-color: var(--accent);
+        background: rgba(0, 201, 177, 0.04);
+      }
+      textarea {
+        min-height: 80px;
+      }
+
+      /* Buttons */
+      .btn {
+        padding: 11px 20px;
+        border: none;
+        border-radius: 10px;
+        font-family: "Cairo", sans-serif;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .btn-accent {
+        background: var(--accent);
+        color: #051a14;
+      }
+      .btn-accent:hover {
+        filter: brightness(1.1);
+      }
+      .btn-finish {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: #fff;
+        width: 100%;
+        padding: 15px;
+        font-size: 1rem;
+      }
+      .btn-finish:hover {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+      }
+      .btn-next {
+        background: var(--accent);
+        color: #051a14;
+        width: 100%;
+        padding: 14px;
+        font-size: 1rem;
+      }
+      .btn-next:hover {
+        filter: brightness(1.1);
+      }
+      .btn-next:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .btn-outline {
+        background: transparent;
+        border: 1.5px solid var(--accent);
+        color: var(--accent);
+      }
+      .btn-outline:hover {
+        background: var(--accent);
+        color: #051a14;
+      }
+      .btn-danger {
+        background: rgba(239, 83, 80, 0.15);
+        color: var(--danger);
+        border: 1px solid rgba(239, 83, 80, 0.3);
+      }
+      .btn-danger:hover {
+        background: var(--danger);
+        color: #fff;
+      }
+      .btn-sm {
+        padding: 7px 13px;
+        font-size: 0.8rem;
+      }
+
+      /* Current patient big display */
+      .current-section {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        flex: 1;
+      }
+      .big-number {
+        font-size: min(12vw, 7rem);
+        font-weight: 900;
+        color: var(--accent);
+        text-shadow: 0 0 40px rgba(0, 201, 177, 0.3);
+        line-height: 1;
+      }
+      .patient-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .type-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 16px;
+        border-radius: 30px;
+        font-size: 0.88rem;
+        font-weight: 700;
+      }
+      .pill-new {
+        background: rgba(59, 158, 237, 0.15);
+        color: var(--new);
+        border: 1px solid rgba(59, 158, 237, 0.3);
+      }
+      .pill-followup {
+        background: rgba(0, 201, 177, 0.12);
+        color: var(--followup);
+        border: 1px solid rgba(0, 201, 177, 0.3);
+      }
+
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 11px;
+      }
+      .stat-box {
+        background: var(--card);
+        border-radius: 12px;
+        padding: 14px;
+        text-align: center;
+        border: 1px solid var(--border);
+      }
+      .stat-val {
+        font-size: 1.8rem;
+        font-weight: 900;
+        line-height: 1;
+      }
+      .stat-val.cyan {
+        color: var(--accent);
+      }
+      .stat-val.yellow {
+        color: var(--accent2);
+      }
+      .stat-val.blue {
+        color: var(--new);
+      }
+      .stat-lbl {
+        font-size: 0.7rem;
+        color: var(--muted);
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 300px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .queue-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 250px;
+        overflow-y: auto;
+      }
+      .queue-list::-webkit-scrollbar {
+        width: 3px;
+      }
+      .queue-list::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+      .patient-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        background: var(--card2);
+        border-radius: 10px;
+        border: 1px solid transparent;
+      }
+      .patient-item:first-child {
+        border-color: rgba(0, 201, 177, 0.25);
+      }
+      .p-num {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #1e3d5c;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 0.82rem;
+        flex-shrink: 0;
+      }
+      .patient-item:first-child .p-num {
+        background: var(--accent);
+        color: #051a14;
+      }
+      .p-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .p-name {
+        font-weight: 700;
+        font-size: 0.86rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .p-meta {
+        font-size: 0.72rem;
+        color: var(--muted);
+      }
+      .p-badge {
+        font-size: 0.67rem;
+        padding: 2px 7px;
+        border-radius: 12px;
+        font-weight: 700;
+      }
+      .badge-new {
+        background: rgba(59, 158, 237, 0.15);
+        color: var(--new);
+      }
+      .badge-followup {
+        background: rgba(0, 201, 177, 0.12);
+        color: var(--followup);
+      }
+      .next-tag {
+        font-size: 0.62rem;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Patient file panel */
+      .patient-file {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .pf-header {
+        background: linear-gradient(135deg, var(--card), var(--card2));
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .pf-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #051a14;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 900;
+        flex-shrink: 0;
+      }
+      .pf-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+      }
+      .pf-sub {
+        font-size: 0.83rem;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .pf-meta {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .pf-tag {
+        background: rgba(255, 255, 255, 0.06);
+        padding: 4px 11px;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+      .pf-tag span {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      /* Previous visits */
+      .visit-history {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 220px;
+        overflow-y: auto;
+      }
+      .visit-item {
+        padding: 14px 16px;
+        background: var(--card2);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .visit-item:hover {
+        border-color: rgba(0, 201, 177, 0.3);
+        background: rgba(0, 201, 177, 0.03);
+      }
+      .visit-item.expanded {
+        border-color: rgba(0, 201, 177, 0.5);
+        background: rgba(0, 201, 177, 0.05);
+      }
+      .vi-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .vi-date {
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: var(--accent);
+        white-space: nowrap;
+      }
+      .vi-type {
+        font-size: 0.72rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .vi-price {
+        font-size: 0.9rem;
+        color: var(--accent2);
+        font-weight: 800;
+        white-space: nowrap;
+      }
+      .vi-body {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+        display: none;
+        font-size: 0.86rem;
+        line-height: 1.8;
+        color: var(--muted);
+      }
+      .vi-body.show {
+        display: block;
+      }
+      .vi-field {
+        margin-bottom: 9px;
+      }
+      .vi-field strong {
+        color: var(--text);
+        display: block;
+        font-size: 0.78rem;
+        margin-bottom: 3px;
+        letter-spacing: 0.3px;
+      }
+
+      /* Current visit form */
+      .visit-form {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .price-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .price-row input {
+        width: 140px;
+      }
+
+      /* Search patient */
+      .search-bar {
+        display: flex;
+        gap: 9px;
+        margin-bottom: 16px;
+      }
+      .search-bar input {
+        flex: 1;
+      }
+
+      /* No patient */
+      .no-patient-msg {
+        text-align: center;
+        padding: 50px 20px;
+        color: var(--muted);
+      }
+      .no-patient-msg .big {
+        font-size: 3.5rem;
+        opacity: 0.3;
+        margin-bottom: 12px;
+      }
+
+      /* Report */
+      .report-summary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 13px;
+        margin-bottom: 20px;
+      }
+      .rstat {
+        background: var(--card);
+        border-radius: 12px;
+        padding: 14px;
+        text-align: center;
+        border: 1px solid var(--border);
+      }
+      .rstat-val {
+        font-size: 1.8rem;
+        font-weight: 900;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .rstat-val.green {
+        color: var(--success);
+      }
+      .rstat-label {
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        background: #1e3d5c;
+        color: var(--text);
+        padding: 9px 12px;
+        text-align: right;
+        font-size: 0.79rem;
+        font-weight: 700;
+      }
+      th:first-child {
+        border-radius: 0 8px 0 0;
+      }
+      th:last-child {
+        border-radius: 8px 0 0 0;
+      }
+      td {
+        padding: 9px 12px;
+        font-size: 0.84rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text);
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:nth-child(even) td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .flash {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 201, 177, 0.07);
+        pointer-events: none;
+        opacity: 0;
+        transition: 0.4s;
+        z-index: 999;
+      }
+      .flash.on {
+        opacity: 1;
+      }
+
+      /* ── Medical History Popup ── */
+      .history-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.3s;
+        backdrop-filter: blur(4px);
+      }
+      .history-overlay.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .history-box {
+        background: var(--card);
+        border: 2px solid var(--accent);
+        border-radius: 20px;
+        width: 680px;
+        max-width: 94vw;
+        max-height: 88vh;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
+        transform: scale(0.9);
+        transition: 0.3s;
+        display: flex;
+        flex-direction: column;
+      }
+      .history-overlay.show .history-box {
+        transform: scale(1);
+      }
+      .history-header {
+        background: linear-gradient(135deg, var(--accent), #00a896);
+        color: #051a14;
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .history-header h2 {
+        font-size: 1.15rem;
+        font-weight: 900;
+      }
+      .history-close {
+        background: rgba(0, 0, 0, 0.15);
+        border: none;
+        color: #051a14;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        font-size: 1.2rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        transition: 0.2s;
+      }
+      .history-close:hover {
+        background: rgba(0, 0, 0, 0.25);
+        transform: rotate(90deg);
+      }
+      .history-body {
+        padding: 0;
+        overflow-y: auto;
+        flex: 1;
+      }
+      .history-body::-webkit-scrollbar {
+        width: 6px;
+      }
+      .history-body::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 6px;
+      }
+      .history-patient-info {
+        background: rgba(0, 201, 177, 0.08);
+        border-bottom: 1px solid var(--border);
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .history-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #051a14;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        font-weight: 900;
+        flex-shrink: 0;
+      }
+      .history-patient-name {
+        font-weight: 700;
+        font-size: 1.05rem;
+      }
+      .history-patient-meta {
+        font-size: 0.78rem;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .history-visits {
+        padding: 12px;
+      }
+      .history-visit-item {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        transition: 0.2s;
+      }
+      .history-visit-item:hover {
+        border-color: rgba(0, 201, 177, 0.3);
+        background: rgba(0, 201, 177, 0.04);
+      }
+      .history-visit-header {
+        padding: 14px 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        user-select: none;
+      }
+      .history-visit-header:hover {
+        background: rgba(0, 201, 177, 0.05);
+      }
+      .hv-date {
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: var(--accent);
+        white-space: nowrap;
+      }
+      .hv-type {
+        font-size: 0.72rem;
+        padding: 3px 9px;
+        border-radius: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .hv-diagnosis {
+        flex: 1;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .hv-diagnosis.empty {
+        color: var(--muted);
+        font-style: italic;
+        font-weight: 400;
+      }
+      .hv-toggle {
+        font-size: 0.75rem;
+        color: var(--muted);
+        transition: 0.2s;
+      }
+      .history-visit-item.expanded .hv-toggle {
+        transform: rotate(180deg);
+      }
+      .history-visit-body {
+        padding: 0 16px 14px 16px;
+        border-top: 1px solid var(--border);
+        display: none;
+        font-size: 0.86rem;
+        line-height: 1.8;
+      }
+      .history-visit-item.expanded .history-visit-body {
+        display: block;
+        animation: slideDown 0.3s ease;
+      }
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .hv-field {
+        margin-bottom: 10px;
+        padding-top: 10px;
+      }
+      .hv-field strong {
+        display: block;
+        color: var(--accent);
+        font-size: 0.8rem;
+        margin-bottom: 5px;
+        letter-spacing: 0.3px;
+      }
+      .hv-field-content {
+        color: var(--muted);
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 8px;
+        border-left: 3px solid var(--accent);
+      }
+      .hv-field-content.empty {
+        font-style: italic;
+        color: rgba(107, 138, 170, 0.5);
+      }
+
+      /* ── PRINT ── */
+      @media print {
+        header,
+        .tabs,
+        #panel-queue,
+        #panel-search,
+        .report-actions,
+        .flash {
+          display: none !important;
+        }
+        #panel-report {
+          display: block !important;
+          padding: 0 !important;
+        }
+        body {
+          background: #fff;
+          color: #000;
+        }
+        .card {
+          box-shadow: none;
+          border: 1px solid #ddd;
+          background: #fff;
+        }
+        .rstat {
+          background: #f5f5f5;
+          border: 1px solid #ddd;
+        }
+        .rstat-val,
+        .rstat-val.green {
+          color: #000;
+        }
+        th {
+          background: #1a3a5c;
+        }
+        td {
+          color: #000;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="flash" id="flash"></div>
+
+    <!-- Medical History Popup -->
+    <div class="history-overlay" id="history-popup">
+      <div class="history-box">
+        <div class="history-header">
+          <h2>📋 التاريخ الطبي للمريض</h2>
+          <button class="history-close" onclick="closeHistory()">✕</button>
+        </div>
+        <div class="history-patient-info" id="history-patient-info"></div>
+        <div class="history-body">
+          <div class="history-visits" id="history-visits-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <header>
+      <h1 id="doc-header">👨‍⚕️ لوحة الدكتور</h1>
+      <div class="hright">
+        <div class="clock" id="clock">--:--</div>
+        <a href="/reception" class="nav-link">الاستقبال</a>
+        <a href="/display" target="_blank" class="nav-link">📺 العرض</a>
+        <button
+          class="logout-btn"
+          style="
+            background: rgba(229, 57, 53, 0.2);
+            border: 1px solid rgba(229, 57, 53, 0.4);
+          "
+          onclick="endDay()"
+        >
+          🌙 إنهاء اليوم
+        </button>
+        <button class="logout-btn" onclick="logout()">خروج</button>
+      </div>
+    </header>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="queue" onclick="switchTab('queue')">
+        🩺 الكشف
+      </button>
+      <button class="tab" data-tab="search" onclick="switchTab('search')">
+        🔍 البحث عن مريض
+      </button>
+      <button class="tab" data-tab="report" onclick="switchTab('report')">
+        📊 التقرير
+      </button>
+    </div>
+
+    <!-- ═══ QUEUE ═══ -->
+    <div
+      id="panel-queue"
+      class="panel"
+      style="display: flex; gap: 22px; padding: 22px 28px"
+    >
+      <div class="current-section">
+        <!-- Current patient display -->
+        <div class="card" id="card-current">
+          <div class="card-title">المريض الحالي</div>
+          <div id="no-patient" class="no-patient-msg">
+            <div class="big">🩺</div>
+            اضغط "التالي" لاستدعاء المريض
+          </div>
+          <div id="current-display" style="display: none">
+            <div
+              style="
+                display: flex;
+                align-items: flex-start;
+                gap: 20px;
+                margin-bottom: 16px;
+              "
+            >
+              <div class="big-number" id="d-number">—</div>
+              <div>
+                <div class="patient-title" id="d-name">—</div>
+                <div id="d-type-pill"></div>
+                <div
+                  style="
+                    font-size: 0.8rem;
+                    color: var(--muted);
+                    margin-top: 6px;
+                  "
+                >
+                  ⏱️ <span id="d-time">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Last visit summary (for followup) -->
+            <div
+              id="last-visit-box"
+              style="
+                display: none;
+                background: rgba(245, 158, 11, 0.07);
+                border: 1px solid rgba(245, 158, 11, 0.2);
+                border-radius: 12px;
+                padding: 14px;
+                margin-bottom: 16px;
+              "
+            >
+              <div
+                style="
+                  font-size: 0.8rem;
+                  font-weight: 700;
+                  color: var(--accent2);
+                  margin-bottom: 8px;
+                "
+              >
+                📋 آخر زيارة
+              </div>
+              <div
+                style="
+                  font-size: 0.84rem;
+                  color: var(--muted);
+                  line-height: 1.8;
+                "
+                id="last-visit-content"
+              ></div>
+            </div>
+
+            <!-- Visit form -->
+            <div class="visit-form" id="visit-form">
+              <div class="form-group">
+                <label>التشخيص</label>
+                <textarea
+                  id="f-diagnosis"
+                  placeholder="اكتب التشخيص هنا..."
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label>الوصفة الطبية / العلاج</label>
+                <textarea
+                  id="f-prescription"
+                  placeholder="الأدوية والجرعات..."
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label>ملاحظات</label>
+                <textarea
+                  id="f-notes"
+                  placeholder="أي ملاحظات إضافية..."
+                  style="min-height: 60px"
+                ></textarea>
+              </div>
+              <div class="price-row">
+                <div class="form-group" style="margin-bottom: 0; flex: 1">
+                  <label>سعر الكشف (جنيه)</label>
+                  <input type="number" id="f-price" min="0" placeholder="0" />
+                </div>
+                <div class="form-group" style="margin-bottom: 0">
+                  <label>إضافة مبلغ زيادة</label>
+                  <div style="display: flex; gap: 7px">
+                    <input
+                      type="number"
+                      id="f-extra"
+                      min="0"
+                      placeholder="0"
+                      style="width: 100px"
+                    />
+                    <button
+                      class="btn btn-outline btn-sm"
+                      style="margin-top: 0; white-space: nowrap"
+                      onclick="addExtraCharge()"
+                    >
+                      + إضافة
+                    </button>
+                  </div>
+                </div>
+                <button
+                  class="btn btn-finish"
+                  style="width: auto; margin-top: 20px"
+                  onclick="finishVisit()"
+                >
+                  ✅ إنهاء الكشف وإرسال الحساب
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-val cyan" id="s-current">—</div>
+            <div class="stat-lbl">يُخدم</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val yellow" id="s-waiting">0</div>
+            <div class="stat-lbl">انتظار</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val blue" id="s-next">—</div>
+            <div class="stat-lbl">التالي</div>
+          </div>
+        </div>
+
+        <button
+          class="btn btn-next"
+          id="btn-next"
+          onclick="callNext()"
+          disabled
+        >
+          استدعاء التالي ←
+        </button>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="card" style="flex: 1">
+          <div class="card-title">قائمة الانتظار</div>
+          <div class="queue-list" id="queue-list">
+            <div
+              style="
+                text-align: center;
+                padding: 24px;
+                color: var(--muted);
+                font-size: 0.86rem;
+              "
+            >
+              لا يوجد مرضى
+            </div>
+          </div>
+        </div>
+        <button
+          class="btn btn-danger btn-sm"
+          onclick="resetQueue()"
+          style="width: 100%; padding: 10px"
+        >
+          🗑️ إعادة تعيين (نهاية اليوم)
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ SEARCH ═══ -->
+    <div
+      id="panel-search"
+      class="panel col"
+      style="
+        display: none;
+        padding: 22px 28px;
+        max-width: 900px;
+        margin: 0 auto;
+        width: 100%;
+        flex-direction: column;
+        gap: 18px;
+      "
+    >
+      <div class="card">
+        <div class="card-title">🔍 البحث عن مريض</div>
+        <div class="search-bar">
+          <input
+            type="text"
+            id="doctor-search"
+            placeholder="ابحث بالاسم أو التليفون..."
+            autocomplete="off"
+          />
+          <button class="btn btn-outline" onclick="doSearch()">بحث</button>
+        </div>
+        <div id="search-results-doctor"></div>
+      </div>
+
+      <!-- Patient detail view -->
+      <div id="patient-detail" style="display: none">
+        <div class="pf-header" id="pf-header"></div>
+        <div class="card">
+          <div class="card-title">📋 تاريخ الزيارات</div>
+          <div class="visit-history" id="visit-history"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ REPORT ═══ -->
+    <div
+      id="panel-report"
+      class="panel col"
+      style="
+        display: none;
+        padding: 22px 28px;
+        max-width: 900px;
+        margin: 0 auto;
+        width: 100%;
+        flex-direction: column;
+        gap: 18px;
+      "
+    >
+      <div style="display: flex; gap: 10px; margin-bottom: 4px">
+        <button class="btn btn-outline btn-sm" onclick="loadReport()">
+          🔄 تحديث
+        </button>
+        <button class="btn btn-outline btn-sm" onclick="printReport()">
+          🖨️ طباعة
+        </button>
+      </div>
+      <div class="report-summary">
+        <div class="rstat">
+          <div class="rstat-val" id="r-total">0</div>
+          <div class="rstat-label">المرضى</div>
+        </div>
+        <div class="rstat">
+          <div class="rstat-val" id="r-new">0</div>
+          <div class="rstat-label">كشف جديد</div>
+        </div>
+        <div class="rstat">
+          <div class="rstat-val" id="r-followup">0</div>
+          <div class="rstat-label">متابعة</div>
+        </div>
+        <div class="rstat">
+          <div class="rstat-val green" id="r-paid">0</div>
+          <div class="rstat-label">تم تحصيله</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span id="rep-date">تقرير اليوم</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>الاسم</th>
+              <th>النوع</th>
+              <th>التشخيص</th>
+              <th>السعر</th>
+              <th>المدفوع</th>
+            </tr>
+          </thead>
+          <tbody id="rep-tbody">
+            <tr>
+              <td
+                colspan="6"
+                style="text-align: center; color: var(--muted); padding: 24px"
+              >
+                لا يوجد بيانات
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      const socket = io();
+      let currentVisitId = null;
+      let currentPatientId = null;
+
+      // ── Tabs ──────────────────────────────────────────────
+      function switchTab(name) {
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.remove("active"));
+        document.querySelectorAll(".panel").forEach((p) => {
+          p.style.display = "none";
+        });
+        document
+          .querySelector(`.tab[data-tab="${name}"]`)
+          .classList.add("active");
+        document.getElementById("panel-" + name).style.display =
+          name === "queue" ? "flex" : "block";
+        if (name === "report") loadReport();
+      }
+
+      function updateClock() {
+        document.getElementById("clock").textContent =
+          new Date().toLocaleTimeString("ar-EG", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      async function logout() {
+        await fetch("/api/logout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role: "doctor" }),
+        });
+        location.href = "/login/doctor";
+      }
+
+      async function endDay() {
+        const confirmed = confirm(
+          "⚠️ هل أنت متأكد من إنهاء اليوم؟\n\n" +
+            "سيتم:\n" +
+            "• مسح قائمة الانتظار الحالية\n" +
+            "• إعادة تعيين أرقام التذاكر\n" +
+            "• البدء من جديد غداً\n\n" +
+            "تأكد من تسجيل كل المدفوعات قبل الإنهاء!",
+        );
+        if (!confirmed) return;
+
+        const res = await fetch("/api/reset", { method: "POST" }).then((r) =>
+          r.json(),
+        );
+        if (res.success) {
+          alert(
+            "✅ تم إنهاء اليوم بنجاح!\n\nيمكنك الآن إغلاق النظام أو البدء في يوم جديد.",
+          );
+          location.reload();
+        }
+      }
+
+      // ── Settings ──────────────────────────────────────────
+      let docSettings = {};
+      fetch("/api/settings")
+        .then((r) => r.json())
+        .then((s) => {
+          docSettings = s;
+          if (s.doctor_name)
+            document.getElementById("doc-header").textContent =
+              "👨‍⚕️ د. " + s.doctor_name;
+        });
+
+      // ── Crash Recovery ────────────────────────────────────
+      async function checkServingPatient() {
+        const res = await fetch("/api/current-serving-patient").then((r) =>
+          r.json(),
+        );
+        if (res.success && res.patient_data) {
+          // محاكاة patient_ready event للـ recovery
+          const event = new CustomEvent("patient_ready_recovery", {
+            detail: res.patient_data,
+          });
+          // استخدام نفس الـ handler
+          handlePatientReady(res.patient_data);
+        }
+      }
+
+      // استدعاء الـ recovery على page load
+      window.addEventListener("DOMContentLoaded", checkServingPatient);
+
+      // ── Next ──────────────────────────────────────────────
+      async function callNext() {
+        document.getElementById("btn-next").disabled = true;
+        await fetch("/api/next", { method: "POST" });
+        const f = document.getElementById("flash");
+        f.classList.add("on");
+        setTimeout(() => f.classList.remove("on"), 500);
+      }
+
+      async function resetQueue() {
+        if (!confirm("هل أنت متأكد؟")) return;
+        await fetch("/api/reset", { method: "POST" });
+      }
+
+      // ── Extra charge ──────────────────────────────────────
+      async function addExtraCharge() {
+        if (!currentVisitId) {
+          alert("لا يوجد مريض حالياً");
+          return;
+        }
+        const amount = parseInt(document.getElementById("f-extra").value);
+        if (!amount || amount <= 0) {
+          alert("ادخل مبلغ");
+          return;
+        }
+        const res = await fetch(`/api/visits/${currentVisitId}/add-charge`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount, note: "إضافة من الدكتور" }),
+        }).then((r) => r.json());
+        if (res.success) {
+          document.getElementById("f-price").value = res.new_price;
+          document.getElementById("f-extra").value = "";
+          document.getElementById("f-price").style.borderColor =
+            "var(--accent)";
+          setTimeout(
+            () => (document.getElementById("f-price").style.borderColor = ""),
+            1500,
+          );
+        }
+      }
+
+      // ── Finish visit ──────────────────────────────────────
+      async function finishVisit() {
+        if (!currentVisitId) {
+          alert("لا يوجد مريض حالياً");
+          return;
+        }
+        const priceVal = document.getElementById("f-price").value;
+        const body = {
+          diagnosis: document.getElementById("f-diagnosis").value.trim(),
+          prescription: document.getElementById("f-prescription").value.trim(),
+          notes: document.getElementById("f-notes").value.trim(),
+          price: priceVal === "" ? 0 : parseInt(priceVal),
+        };
+        const res = await fetch(`/api/visits/${currentVisitId}/finish`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        }).then((r) => r.json());
+        if (res.success) {
+          document.getElementById("current-display").style.display = "none";
+          document.getElementById("no-patient").style.display = "block";
+          document.getElementById("no-patient").innerHTML =
+            '<div class="big">✅</div>تم إنهاء الكشف، في انتظار المريض التالي';
+          currentVisitId = null;
+          currentPatientId = null;
+        }
+      }
+
+      // ── Format Date ───────────────────────────────────────
+      function formatVisitDate(dateStr) {
+        if (!dateStr) return "—";
+        const [y, m, d] = dateStr.split("-");
+        const months = [
+          "",
+          "يناير",
+          "فبراير",
+          "مارس",
+          "إبريل",
+          "مايو",
+          "يونيو",
+          "يوليو",
+          "أغسطس",
+          "سبتمبر",
+          "أكتوبر",
+          "نوفمبر",
+          "ديسمبر",
+        ];
+        return `${parseInt(d)} ${months[parseInt(m)]} ${y}`;
+      }
+
+      // ── Medical History Popup ─────────────────────────────
+      function showHistory(patientData, visits) {
+        const p = patientData;
+        const totalVisits = visits.length;
+
+        // Patient info
+        document.getElementById("history-patient-info").innerHTML = `
+          <div class="history-avatar">${p.name?.charAt(0) || "؟"}</div>
+          <div>
+            <div class="history-patient-name">${p.name || "—"}</div>
+            <div class="history-patient-meta">📚 إجمالي ${totalVisits} زيارة سابقة</div>
+          </div>
+        `;
+
+        // Visits list
+        const visitsHTML = visits
+          .map(
+            (v, idx) => `
+          <div class="history-visit-item" onclick="toggleHistoryVisit(this)">
+            <div class="history-visit-header">
+              <div class="hv-date">📅 ${formatVisitDate(v.date)}</div>
+              <span class="hv-type" style="background:${v.visit_type === "new" ? "rgba(59,158,237,.15)" : "rgba(0,201,177,.12)"};color:${v.visit_type === "new" ? "var(--new)" : "var(--followup)"}">${v.visit_type === "new" ? "🆕 جديد" : "🔄 متابعة"}</span>
+              ${idx === 0 ? '<span style="font-size:.7rem;padding:2px 8px;background:rgba(0,201,177,.2);color:var(--accent);border-radius:10px;font-weight:700;">الأحدث</span>' : ""}
+              <div class="hv-diagnosis ${v.diagnosis ? "" : "empty"}">
+                ${v.diagnosis ? "🩺 " + v.diagnosis : "لم يُسجل تشخيص"}
+              </div>
+              <div class="hv-toggle">▼</div>
+            </div>
+            <div class="history-visit-body">
+              <div class="hv-field">
+                <strong>🩺 التشخيص الكامل</strong>
+                <div class="hv-field-content ${v.diagnosis ? "" : "empty"}">${v.diagnosis || "لم يُسجل تشخيص لهذه الزيارة"}</div>
+              </div>
+              <div class="hv-field">
+                <strong>💊 الوصفة الطبية / الأدوية</strong>
+                <div class="hv-field-content ${v.prescription ? "" : "empty"}">${v.prescription || "لم تُسجل وصفة طبية"}</div>
+              </div>
+              ${v.notes ? `<div class="hv-field"><strong>📝 ملاحظات الدكتور</strong><div class="hv-field-content">${v.notes}</div></div>` : ""}
+              <div class="hv-field">
+                <strong>💰 الحساب</strong>
+                <div class="hv-field-content">السعر: ${v.price} ج — مدفوع: ${v.paid} ج — متبقي: <span style="color:${v.price - v.paid > 0 ? "var(--accent2)" : "var(--success)"};font-weight:900;">${v.price - v.paid} ج</span></div>
+              </div>
+            </div>
+          </div>
+        `,
+          )
+          .join("");
+
+        document.getElementById("history-visits-list").innerHTML = visitsHTML;
+        document.getElementById("history-popup").classList.add("show");
+      }
+
+      function closeHistory() {
+        document.getElementById("history-popup").classList.remove("show");
+      }
+
+      function toggleHistoryVisit(element) {
+        element.classList.toggle("expanded");
+      }
+
+      // ── Handle Patient Ready (shared by socket & recovery) ─
+      function handlePatientReady(data) {
+        currentVisitId = data.current_visit_id;
+        currentPatientId = data.patient.id;
+
+        document.getElementById("no-patient").style.display = "none";
+        document.getElementById("current-display").style.display = "block";
+
+        ["f-diagnosis", "f-prescription", "f-notes"].forEach(
+          (id) => (document.getElementById(id).value = ""),
+        );
+        document.getElementById("f-extra").value = "";
+
+        const visitType = data.patient?.visit_type || "new";
+        const defaultPrice =
+          visitType === "new"
+            ? (docSettings.price_new ?? 200)
+            : (docSettings.price_followup ?? 100);
+        document.getElementById("f-price").value = defaultPrice;
+        document.getElementById("f-price").placeholder =
+          visitType === "new" ? `كشف جديد` : `متابعة — يمكن تصفيره`;
+
+        // ملف المريض السابق
+        const lvBox = document.getElementById("last-visit-box");
+        const allVisits = data.visits || [];
+        const prevVisits = allVisits.filter(
+          (v) => v.id !== data.current_visit_id,
+        );
+
+        if (prevVisits.length > 0) {
+          lvBox.style.display = "block";
+          const lv = prevVisits[0];
+          const lvDate = formatVisitDate(lv.date);
+          const totalVisits = prevVisits.length;
+          let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="font-size:.82rem;font-weight:700;color:var(--accent2);">
+        📋 آخر زيارة: ${lvDate} &nbsp;
+        <span style="font-size:.72rem;padding:2px 8px;border-radius:12px;font-weight:700;
+          background:${lv.visit_type === "new" ? "rgba(59,158,237,.15)" : "rgba(0,201,177,.12)"};
+          color:${lv.visit_type === "new" ? "var(--new)" : "var(--followup)"}">${lv.visit_type === "new" ? "🆕 جديد" : "🔄 متابعة"}</span>
+      </div>
+      <div style="font-size:.76rem;color:var(--muted);">📚 إجمالي ${totalVisits} زيارة سابقة</div>
+    </div>`;
+          if (lv.diagnosis)
+            html += `<div style="margin-bottom:7px;padding:8px 11px;background:rgba(0,201,177,.06);border-radius:9px;"><strong style="color:var(--accent);font-size:.82rem;">🩺 التشخيص السابق:</strong><div style="color:var(--text);margin-top:4px;font-size:.88rem;">${lv.diagnosis}</div></div>`;
+          if (lv.prescription)
+            html += `<div style="margin-bottom:7px;"><strong style="color:var(--text);font-size:.82rem;">💊 العلاج السابق:</strong><div style="color:var(--muted);margin-top:3px;font-size:.84rem;">${lv.prescription}</div></div>`;
+          if (lv.notes)
+            html += `<div style="margin-bottom:7px;"><strong style="color:var(--text);font-size:.82rem;">📝 ملاحظات سابقة:</strong><div style="color:var(--muted);margin-top:3px;font-size:.84rem;">${lv.notes}</div></div>`;
+          if (prevVisits.length > 1) {
+            html += `<details style="margin-top:12px;padding:10px;background:rgba(255,255,255,.02);border-radius:10px;border:1px solid var(--border);">
+        <summary style="cursor:pointer;font-size:.82rem;color:var(--accent);font-weight:700;padding:4px;">📂 عرض كل الزيارات السابقة (${prevVisits.length} زيارة)</summary>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;max-height:240px;overflow-y:auto;padding:4px;">
+        ${prevVisits
+          .slice(1)
+          .map(
+            (v, idx) => `
+          <div style="padding:11px 13px;background:rgba(255,255,255,.04);border-radius:10px;border:1px solid var(--border);font-size:.83rem;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">
+              <div style="font-weight:700;color:var(--accent);font-size:.86rem;">📅 ${formatVisitDate(v.date)}</div>
+              <span style="font-size:.7rem;padding:2px 7px;border-radius:10px;font-weight:700;
+                background:${v.visit_type === "new" ? "rgba(59,158,237,.15)" : "rgba(0,201,177,.12)"};
+                color:${v.visit_type === "new" ? "var(--new)" : "var(--followup)"}">${v.visit_type === "new" ? "🆕" : "🔄"}</span>
+              <span style="margin-right:auto;font-size:.74rem;color:var(--muted);">زيارة #${prevVisits.length - idx}</span>
+            </div>
+            ${v.diagnosis ? `<div style="margin-bottom:5px;"><strong style="color:var(--text);font-size:.78rem;">🩺 التشخيص:</strong><div style="color:var(--muted);margin-top:2px;font-size:.82rem;">${v.diagnosis}</div></div>` : '<div style="color:var(--muted);font-style:italic;font-size:.78rem;margin-bottom:5px;">لم يُسجل تشخيص</div>'}
+            ${v.prescription ? `<div style="margin-bottom:5px;"><strong style="color:var(--text);font-size:.78rem;">💊 الوصفة:</strong><div style="color:var(--muted);margin-top:2px;font-size:.82rem;">${v.prescription}</div></div>` : ""}
+            ${v.notes ? `<div><strong style="color:var(--text);font-size:.78rem;">📝 ملاحظات:</strong><div style="color:var(--muted);margin-top:2px;font-size:.82rem;">${v.notes}</div></div>` : ""}
+          </div>`,
+          )
+          .join("")}
+        </div></details>`;
+          }
+          document.getElementById("last-visit-content").innerHTML = html;
+        } else {
+          lvBox.style.display = "none";
+        }
+
+        // فتح بوب-آب التاريخ الطبي تلقائياً لو المريض عنده زيارات سابقة
+        if (prevVisits.length > 0) {
+          setTimeout(() => {
+            showHistory(data.patient, prevVisits);
+          }, 800);
+        }
+      }
+
+      // ── Patient ready ──────────────────────────────────────
+      socket.on("patient_ready", function (data) {
+        handlePatientReady(data);
+      });
+
+      // ── Socket state update ───────────────────────────────
+      socket.on("state_update", function (s) {
+        document.getElementById("s-current").textContent = s.current || "—";
+        document.getElementById("s-waiting").textContent = s.waiting_count;
+        const nxt = s.waiting_patients[0];
+        document.getElementById("s-next").textContent = nxt ? nxt.ticket : "—";
+        document.getElementById("btn-next").disabled = s.waiting_count === 0;
+
+        const serving = s.queue.find((p) => p.status === "serving");
+        if (serving) {
+          document.getElementById("d-number").textContent = serving.ticket;
+          document.getElementById("d-name").textContent = serving.name;
+          document.getElementById("d-time").textContent = serving.time;
+          document.getElementById("d-type-pill").innerHTML =
+            serving.type === "new"
+              ? '<span class="type-pill pill-new">🆕 كشف جديد</span>'
+              : '<span class="type-pill pill-followup">🔄 متابعة</span>';
+        }
+
+        const list = document.getElementById("queue-list");
+        if (!s.waiting_patients.length) {
+          list.innerHTML =
+            '<div style="text-align:center;padding:22px;color:var(--muted);font-size:.85rem;">🎉 انتهت القائمة</div>';
+          return;
+        }
+        list.innerHTML = s.waiting_patients
+          .map(
+            (p, i) => `
+    <div class="patient-item">
+      <div class="p-num">${p.ticket}</div>
+      <div class="p-info">
+        <div class="p-name">${p.name}</div>
+        <div class="p-meta">${p.time} ${i === 0 ? '<span class="next-tag">▶ التالي</span>' : ""}</div>
+      </div>
+      <span class="p-badge ${p.type === "new" ? "badge-new" : "badge-followup"}">${p.type === "new" ? "🆕" : "🔄"}</span>
+    </div>`,
+          )
+          .join("");
+      });
+
+      // ── Search ────────────────────────────────────────────
+      document
+        .getElementById("doctor-search")
+        .addEventListener("keydown", (e) => {
+          if (e.key === "Enter") doSearch();
+        });
+
+      async function doSearch() {
+        const q = document.getElementById("doctor-search").value.trim();
+        if (q.length < 2) return;
+        const res = await fetch(
+          "/api/patients/search?q=" + encodeURIComponent(q),
+        ).then((r) => r.json());
+        const box = document.getElementById("search-results-doctor");
+        if (!res.length) {
+          box.innerHTML =
+            '<div style="text-align:center;padding:20px;color:var(--muted);">لم يُوجد نتائج</div>';
+          return;
+        }
+        box.innerHTML = res
+          .map(
+            (p) => `
+    <div onclick="loadPatientDetail(${p.id})" style="display:flex;align-items:center;gap:11px;padding:12px 14px;background:var(--card2);border-radius:10px;margin-bottom:8px;cursor:pointer;border:1px solid var(--border);transition:.2s;" onmouseover="this.style.borderColor='rgba(0,201,177,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--accent);color:#051a14;display:flex;align-items:center;justify-content:center;font-weight:900;">${p.name.charAt(0)}</div>
+      <div><div style="font-weight:700;font-size:.9rem;">${p.name}</div><div style="font-size:.76rem;color:var(--muted);">${p.phone || "بدون تليفون"}${p.address ? " • " + p.address : ""}</div></div>
+    </div>`,
+          )
+          .join("");
+      }
+
+      async function loadPatientDetail(pid) {
+        const data = await fetch(`/api/patients/${pid}`).then((r) => r.json());
+        const p = data.patient;
+        document.getElementById("patient-detail").style.display = "block";
+        document.getElementById("pf-header").innerHTML = `
+    <div class="pf-avatar">${p.name.charAt(0)}</div>
+    <div>
+      <div class="pf-name">${p.name}</div>
+      <div class="pf-sub">${p.phone || ""}${p.address ? " • " + p.address : ""}</div>
+      <div class="pf-meta">
+        <div class="pf-tag">📋 عدد الزيارات: <span>${data.visits.length}</span></div>
+        <div class="pf-tag">📅 منذ: <span>${p.created_at?.split(" ")[0] || "—"}</span></div>
+      </div>
+    </div>`;
+        const hist = document.getElementById("visit-history");
+        if (!data.visits.length) {
+          hist.innerHTML =
+            '<div style="text-align:center;padding:20px;color:var(--muted);">لا يوجد زيارات سابقة</div>';
+          return;
+        }
+        hist.innerHTML = data.visits
+          .map(
+            (v) => `
+    <div class="visit-item" onclick="toggleVisit(this)">
+      <div class="vi-header">
+        <div class="vi-date">📅 ${v.date}</div>
+        <span class="vi-type" style="background:${v.visit_type === "new" ? "rgba(59,158,237,.15)" : "rgba(0,201,177,.12)"};color:${v.visit_type === "new" ? "var(--new)" : "var(--followup)"}">${v.visit_type === "new" ? "🆕 جديد" : "🔄 متابعة"}</span>
+        <div class="vi-price">${v.price} جنيه</div>
+      </div>
+      <div class="vi-body">
+        ${v.diagnosis ? `<div class="vi-field"><strong>🩺 التشخيص</strong>${v.diagnosis}</div>` : ""}
+        ${v.prescription ? `<div class="vi-field"><strong>💊 العلاج</strong>${v.prescription}</div>` : ""}
+        ${v.notes ? `<div class="vi-field"><strong>📝 ملاحظات</strong>${v.notes}</div>` : ""}
+        <div class="vi-field"><strong>💰 المالي</strong>الإجمالي: ${v.price} ج — المدفوع: ${v.paid} ج — المتبقي: ${v.price - v.paid} ج</div>
+      </div>
+    </div>`,
+          )
+          .join("");
+      }
+
+      function toggleVisit(el) {
+        el.classList.toggle("expanded");
+        el.querySelector(".vi-body").classList.toggle("show");
+      }
+
+      // ── Report ────────────────────────────────────────────
+      async function loadReport() {
+        const d = await fetch("/api/report").then((r) => r.json());
+        document.getElementById("r-total").textContent = d.total;
+        document.getElementById("r-new").textContent = d.new_count;
+        document.getElementById("r-followup").textContent = d.followup_count;
+        document.getElementById("r-paid").textContent =
+          d.total_paid.toLocaleString("ar-EG");
+        document.getElementById("rep-date").textContent = "تقرير يوم " + d.date;
+        const tbody = document.getElementById("rep-tbody");
+        if (!d.visits.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px;">لا يوجد بيانات</td></tr>';
+          return;
+        }
+        tbody.innerHTML = d.visits
+          .map(
+            (v, i) => `
+    <tr>
+      <td>${i + 1}</td><td><strong>${v.name}</strong></td>
+      <td><span style="font-size:.72rem;padding:2px 7px;border-radius:12px;font-weight:700;background:${v.visit_type === "new" ? "rgba(59,158,237,.15)" : "rgba(0,201,177,.12)"};color:${v.visit_type === "new" ? "var(--new)" : "var(--followup)"}">${v.visit_type === "new" ? "🆕" : "🔄"}</span></td>
+      <td style="font-size:.8rem;color:var(--muted)">${v.diagnosis || "—"}</td>
+      <td>${v.price} ج</td><td style="color:var(--success)">${v.paid} ج</td>
+    </tr>`,
+          )
+          .join("");
+      }
+
+      function printReport() {
+        const date =
+          document
+            .getElementById("rep-date")
+            .textContent.replace("تقرير يوم ", "") ||
+          new Date().toISOString().split("T")[0];
+        const cn = docSettings.clinic_name || "العيادة";
+        const old = document.title;
+        document.title = `تقرير ${cn} - ${date}`;
+        window.print();
+        document.title = old;
+      }
+
+      // ── تحذير عند إغلاق المتصفح ──────────────────────────
+      window.addEventListener("beforeunload", function (e) {
+        // تحذير بسيط لتذكير المستخدم بإنهاء اليوم
+        e.preventDefault();
+        e.returnValue =
+          '⚠️ تذكير: هل أنهيت اليوم؟\n\nاضغط "إنهاء اليوم" من الأعلى قبل إغلاق النظام.';
+        return e.returnValue;
+      });
+    </script>
+  </body>
+</html>

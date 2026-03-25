@@ -1,0 +1,1359 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>التقارير</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #0a5c8a;
+        --pl: #1a7ab5;
+        --accent: #00c9b1;
+        --bg: #f0f4f8;
+        --card: #fff;
+        --text: #1a2636;
+        --muted: #7a8fa6;
+        --border: #dce5ef;
+        --shadow: 0 4px 24px rgba(10, 92, 138, 0.1);
+        --success: #2e7d32;
+        --warning: #f59e0b;
+        --danger: #e53935;
+        --new: #0a5c8a;
+        --followup: #00897b;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Cairo", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ── Header ── */
+      header {
+        background: var(--primary);
+        color: #fff;
+        padding: 13px 26px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+      }
+      header h1 {
+        font-size: 1.2rem;
+        font-weight: 700;
+      }
+      .nav-links {
+        display: flex;
+        gap: 9px;
+        align-items: center;
+      }
+      .nav-links a {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        font-size: 0.82rem;
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: 0.2s;
+      }
+      .nav-links a:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+      }
+      .logout-btn {
+        background: transparent;
+        color: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        font-family: "Cairo", sans-serif;
+        font-size: 0.82rem;
+        padding: 5px 12px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .logout-btn:hover {
+        background: rgba(229, 57, 53, 0.3);
+        color: #fff;
+      }
+
+      /* ── Tabs ── */
+      .tabs {
+        background: #fff;
+        border-bottom: 2px solid var(--border);
+        display: flex;
+        padding: 0 26px;
+      }
+      .tab {
+        padding: 13px 22px;
+        font-family: "Cairo", sans-serif;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--muted);
+        border: none;
+        background: none;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        transition: 0.2s;
+      }
+      .tab.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+      }
+      .tab:hover:not(.active) {
+        color: var(--text);
+      }
+
+      /* ── Panels ── */
+      .panel {
+        display: none;
+        padding: 26px 28px;
+        max-width: 1100px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      .panel.active {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      /* ── Card ── */
+      .card {
+        background: var(--card);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        padding: 22px;
+        border: 1px solid var(--border);
+      }
+      .card-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 16px;
+        padding-bottom: 11px;
+        border-bottom: 2px solid var(--bg);
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      /* ── Filters ── */
+      .filters {
+        display: flex;
+        align-items: flex-end;
+        gap: 13px;
+        flex-wrap: wrap;
+      }
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .filter-group label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .filter-group input,
+      .filter-group select {
+        padding: 10px 14px;
+        border: 2px solid var(--border);
+        border-radius: 11px;
+        font-family: "Cairo", sans-serif;
+        font-size: 0.9rem;
+        color: var(--text);
+        background: var(--bg);
+        outline: none;
+        transition: 0.2s;
+      }
+      .filter-group input:focus,
+      .filter-group select:focus {
+        border-color: var(--pl);
+        background: #fff;
+      }
+      .search-wrap {
+        position: relative;
+        flex: 1;
+        min-width: 220px;
+      }
+      .search-results {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        background: #fff;
+        border: 2px solid var(--border);
+        border-radius: 11px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+        max-height: 220px;
+        overflow-y: auto;
+        display: none;
+        margin-top: 3px;
+      }
+      .search-results.show {
+        display: block;
+      }
+      .search-item {
+        padding: 10px 14px;
+        cursor: pointer;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        transition: 0.15s;
+      }
+      .search-item:last-child {
+        border-bottom: none;
+      }
+      .search-item:hover {
+        background: #f0f8ff;
+      }
+      .si-name {
+        font-weight: 700;
+        font-size: 0.88rem;
+      }
+      .si-sub {
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+
+      /* ── Buttons ── */
+      .btn {
+        padding: 11px 20px;
+        border: none;
+        border-radius: 11px;
+        font-family: "Cairo", sans-serif;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .btn-primary {
+        background: var(--primary);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--pl);
+      }
+      .btn-outline {
+        background: transparent;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+      }
+      .btn-outline:hover {
+        background: var(--primary);
+        color: #fff;
+      }
+      .btn-sm {
+        padding: 7px 14px;
+        font-size: 0.82rem;
+      }
+
+      /* ── Summary cards ── */
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 13px;
+      }
+      .sum-card {
+        background: var(--card);
+        border-radius: 13px;
+        padding: 16px;
+        text-align: center;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+      }
+      .sum-val {
+        font-size: 1.8rem;
+        font-weight: 900;
+        line-height: 1;
+      }
+      .sum-val.blue {
+        color: var(--primary);
+      }
+      .sum-val.green {
+        color: var(--success);
+      }
+      .sum-val.orange {
+        color: var(--warning);
+      }
+      .sum-val.teal {
+        color: var(--accent);
+      }
+      .sum-val.red {
+        color: var(--danger);
+      }
+      .sum-lbl {
+        font-size: 0.73rem;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+
+      /* ── Day breakdown ── */
+      .day-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 6px;
+      }
+      .day-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 14px;
+        background: var(--bg);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.15s;
+        border: 1px solid transparent;
+      }
+      .day-row:hover {
+        border-color: var(--pl);
+        background: #e8f4fd;
+      }
+      .day-row.active {
+        border-color: var(--primary);
+        background: #e3f0fb;
+      }
+      .dr-date {
+        font-weight: 700;
+        font-size: 0.9rem;
+        min-width: 90px;
+      }
+      .dr-count {
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+      .dr-money {
+        margin-right: auto;
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: var(--primary);
+      }
+      .dr-remain {
+        font-size: 0.82rem;
+        color: var(--warning);
+        font-weight: 600;
+      }
+
+      /* ── Table ── */
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        background: var(--primary);
+        color: #fff;
+        padding: 10px 13px;
+        text-align: right;
+        font-size: 0.8rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      th:first-child {
+        border-radius: 0 8px 0 0;
+      }
+      th:last-child {
+        border-radius: 8px 0 0 0;
+      }
+      td {
+        padding: 9px 13px;
+        font-size: 0.85rem;
+        border-bottom: 1px solid var(--border);
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:nth-child(even) td {
+        background: #f8fafc;
+      }
+      .t-new {
+        background: #e3f0fb;
+        color: var(--new);
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.72rem;
+        font-weight: 700;
+      }
+      .t-followup {
+        background: #e0f4f1;
+        color: var(--followup);
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.72rem;
+        font-weight: 700;
+      }
+      .t-paid {
+        color: var(--success);
+        font-weight: 700;
+      }
+      .t-remain {
+        font-weight: 700;
+      }
+      .t-remain.has {
+        color: var(--warning);
+      }
+      .t-remain.zero {
+        color: var(--success);
+      }
+
+      /* ── Patient profile ── */
+      .patient-profile {
+        background: linear-gradient(135deg, #e3f0fb, #d4eeff);
+        border: 2px solid var(--pl);
+        border-radius: 14px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      .pp-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        font-weight: 900;
+        flex-shrink: 0;
+      }
+      .pp-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+      }
+      .pp-sub {
+        font-size: 0.82rem;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .pp-tags {
+        display: flex;
+        gap: 9px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .pp-tag {
+        background: rgba(10, 92, 138, 0.1);
+        padding: 3px 11px;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        color: var(--primary);
+        font-weight: 600;
+      }
+
+      /* ── Visit item (patient history) ── */
+      .visit-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .visit-card {
+        background: var(--bg);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+      }
+      .visit-card-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 14px 18px;
+        cursor: pointer;
+        transition: 0.15s;
+      }
+      .visit-card-header:hover {
+        background: #e8f4fd;
+      }
+      .vc-date {
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: var(--primary);
+        white-space: nowrap;
+      }
+      .vc-type {
+        flex-shrink: 0;
+      }
+      .vc-price {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: var(--primary);
+        white-space: nowrap;
+      }
+      .vc-remain {
+        font-size: 0.78rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .vc-remain.has {
+        color: var(--warning);
+      }
+      .vc-remain.zero {
+        color: var(--success);
+      }
+      .visit-card-body {
+        padding: 16px 18px;
+        border-top: 1px solid var(--border);
+        display: none;
+        font-size: 0.87rem;
+        line-height: 1.9;
+      }
+      .visit-card-body.show {
+        display: block;
+      }
+      .vb-field {
+        margin-bottom: 10px;
+        color: var(--muted);
+      }
+      .vb-field strong {
+        color: var(--text);
+        display: block;
+        font-size: 0.78rem;
+        margin-bottom: 4px;
+        letter-spacing: 0.3px;
+      }
+
+      /* ── Empty state ── */
+      .empty {
+        text-align: center;
+        padding: 48px 20px;
+        color: var(--muted);
+      }
+      .empty .big {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        opacity: 0.3;
+      }
+
+      /* ── Loading ── */
+      .loading {
+        text-align: center;
+        padding: 32px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      /* ══════════════════════════════
+   PRINT STYLES
+══════════════════════════════ */
+      @media print {
+        header,
+        .tabs,
+        .filters,
+        .btn,
+        .btn-primary,
+        .btn-outline,
+        .day-grid,
+        .no-print {
+          display: none !important;
+        }
+        body {
+          background: #fff;
+        }
+        .panel {
+          display: block !important;
+          padding: 0 !important;
+          max-width: none;
+        }
+        .card {
+          box-shadow: none;
+          border: 1px solid #ddd;
+          margin-bottom: 12px;
+          break-inside: avoid;
+        }
+        .summary-grid {
+          grid-template-columns: repeat(5, 1fr);
+        }
+        .sum-card {
+          background: #f5f5f5;
+          border: 1px solid #ddd;
+        }
+        .sum-val {
+          color: #000 !important;
+        }
+        th {
+          background: #1a3a5c !important;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        td {
+          color: #000;
+        }
+        /* إخفاء عمود التشخيص في الطباعة */
+        th.col-diag,
+        td.col-diag {
+          display: none !important;
+        }
+        .visit-card-body .diag-line {
+          display: none !important;
+        }
+        .print-header {
+          display: block !important;
+        }
+      }
+      .print-header {
+        display: none;
+        text-align: center;
+        margin-bottom: 18px;
+      }
+      .print-header h2 {
+        font-size: 1.3rem;
+        font-weight: 900;
+      }
+      .print-header p {
+        font-size: 0.85rem;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1 id="clinic-header">📊 التقارير</h1>
+      <div class="nav-links">
+        <a href="/reception">🖥️ الاستقبال</a>
+        <a href="/doctor" target="_blank">👨‍⚕️ الدكتور</a>
+        <button class="logout-btn" onclick="logout()">خروج</button>
+      </div>
+    </header>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('financial')">
+        💰 التقارير المالية
+      </button>
+      <button class="tab" onclick="switchTab('debtors')">
+        ⚠️ المرضى المدينين
+      </button>
+      <button class="tab" onclick="switchTab('patient')">👤 تقرير مريض</button>
+    </div>
+
+    <!-- ══ FINANCIAL ══ -->
+    <div id="panel-financial" class="panel active">
+      <!-- فلاتر -->
+      <div class="card no-print">
+        <div class="card-title">🔍 تحديد الفترة</div>
+        <div class="filters">
+          <div class="filter-group">
+            <label>من تاريخ</label>
+            <input type="date" id="f-from" />
+          </div>
+          <div class="filter-group">
+            <label>لحد تاريخ</label>
+            <input type="date" id="f-to" />
+          </div>
+          <div class="filter-group">
+            <label>فترات سريعة</label>
+            <select id="quick-period" onchange="applyQuickPeriod()">
+              <option value="">اختار...</option>
+              <option value="today">اليوم</option>
+              <option value="week">آخر 7 أيام</option>
+              <option value="month">الشهر الحالي</option>
+              <option value="last_month">الشهر اللي فات</option>
+              <option value="year">السنة الحالية</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="loadFinancial()">
+            عرض التقرير
+          </button>
+          <button
+            class="btn btn-outline btn-sm"
+            onclick="printFinancial()"
+            id="btn-print-fin"
+            style="display: none"
+          >
+            🖨️ طباعة
+          </button>
+        </div>
+      </div>
+
+      <!-- print header (بيظهر في الطباعة بس) -->
+      <div class="print-header" id="fin-print-header">
+        <h2 id="fin-print-title">التقرير المالي</h2>
+        <p id="fin-print-sub"></p>
+      </div>
+
+      <!-- ملخص -->
+      <div id="fin-summary" style="display: none">
+        <div class="summary-grid">
+          <div class="sum-card">
+            <div class="sum-val blue" id="fs-total">0</div>
+            <div class="sum-lbl">إجمالي المرضى</div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-val teal" id="fs-new">0</div>
+            <div class="sum-lbl">كشف جديد</div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-val teal" id="fs-followup">0</div>
+            <div class="sum-lbl">متابعة</div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-val green" id="fs-paid">0</div>
+            <div class="sum-lbl">تم تحصيله (جنيه)</div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-val red" id="fs-remain">0</div>
+            <div class="sum-lbl">المتبقي (جنيه)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- تفاصيل يومية -->
+      <div id="fin-days-card" style="display: none" class="card no-print">
+        <div class="card-title">
+          📅 تفصيل يومي
+          <span
+            style="font-size: 0.78rem; color: var(--muted); margin-right: auto"
+            >اضغط يوم لتفاصيله</span
+          >
+        </div>
+        <div class="day-grid" id="fin-days"></div>
+      </div>
+
+      <!-- جدول الزيارات -->
+      <div id="fin-table-card" style="display: none" class="card">
+        <div class="card-title" id="fin-table-title">📋 تفاصيل الزيارات</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>التاريخ</th>
+                <th>الاسم</th>
+                <th>النوع</th>
+                <th class="col-diag">التشخيص</th>
+                <th>السعر</th>
+                <th>المدفوع</th>
+                <th>المتبقي</th>
+              </tr>
+            </thead>
+            <tbody id="fin-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="fin-empty" class="empty" style="display: none">
+        <div class="big">📊</div>
+        <p>اختار فترة زمنية وابدأ البحث</p>
+      </div>
+    </div>
+
+    <!-- ══ DEBTORS ══ -->
+    <div id="panel-debtors" class="panel">
+      <div class="card no-print">
+        <div class="card-title">⚠️ تقرير المرضى المدينين</div>
+        <div class="filters">
+          <div class="filter-group">
+            <label>أقل مديونية (جنيه)</label>
+            <input type="number" id="d-min-balance" min="1" value="1" />
+          </div>
+          <div class="filter-group" style="flex: 1; min-width: 220px">
+            <label>بحث (اسم / تليفون)</label>
+            <input type="text" id="d-query" placeholder="اختياري" />
+          </div>
+          <button class="btn btn-primary" onclick="loadDebtors()">
+            عرض التقرير
+          </button>
+          <button
+            class="btn btn-outline btn-sm"
+            onclick="printDebtors()"
+            id="btn-print-deb"
+            style="display: none"
+          >
+            🖨️ طباعة
+          </button>
+        </div>
+      </div>
+
+      <div class="print-header" id="deb-print-header">
+        <h2 id="deb-print-title">تقرير المرضى المدينين</h2>
+        <p id="deb-print-sub"></p>
+      </div>
+
+      <div id="deb-summary" style="display: none">
+        <div class="summary-grid">
+          <div class="sum-card">
+            <div class="sum-val blue" id="ds-count">0</div>
+            <div class="sum-lbl">عدد المرضى</div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-val green" id="ds-paid">0</div>
+            <div class="sum-lbl">إجمالي المدفوع</div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-val teal" id="ds-charged">0</div>
+            <div class="sum-lbl">إجمالي المستحق</div>
+          </div>
+          <div class="sum-card" style="grid-column: span 2">
+            <div class="sum-val red" id="ds-balance">0</div>
+            <div class="sum-lbl">إجمالي المتبقي</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="deb-table-card" style="display: none" class="card">
+        <div class="card-title">📋 تفاصيل المرضى المدينين</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>الاسم</th>
+                <th>عدد الزيارات</th>
+                <th>إجمالي المستحق</th>
+                <th>إجمالي المدفوع</th>
+                <th>المتبقي</th>
+                <th>آخر زيارة</th>
+              </tr>
+            </thead>
+            <tbody id="deb-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="deb-empty" class="empty">
+        <div class="big">⚠️</div>
+        <p>اضغط عرض التقرير لإظهار المرضى المدينين</p>
+      </div>
+    </div>
+
+    <!-- ══ PATIENT ══ -->
+    <div id="panel-patient" class="panel">
+      <!-- بحث -->
+      <div class="card no-print">
+        <div class="card-title">🔍 بحث عن مريض</div>
+        <div class="filters">
+          <div class="filter-group search-wrap" style="flex: 1">
+            <label>اسم المريض أو تليفونه</label>
+            <input
+              type="text"
+              id="p-search"
+              placeholder="ابحث..."
+              autocomplete="off"
+            />
+            <div class="search-results" id="p-search-results"></div>
+          </div>
+          <button
+            class="btn btn-outline btn-sm"
+            onclick="printPatient()"
+            id="btn-print-pat"
+            style="display: none; margin-top: 22px"
+          >
+            🖨️ طباعة
+          </button>
+        </div>
+      </div>
+
+      <!-- print header -->
+      <div class="print-header" id="pat-print-header">
+        <h2 id="pat-print-title">تقرير مريض</h2>
+        <p id="pat-print-sub"></p>
+      </div>
+
+      <!-- بروفايل المريض -->
+      <div id="pat-profile" style="display: none"></div>
+
+      <!-- ملخص -->
+      <div id="pat-summary" style="display: none">
+        <div class="summary-grid">
+          <div class="sum-card">
+            <div class="sum-val blue" id="ps-visits">0</div>
+            <div class="sum-lbl">إجمالي الزيارات</div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-val teal" id="ps-new">0</div>
+            <div class="sum-lbl">كشف جديد</div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-val teal" id="ps-followup">0</div>
+            <div class="sum-lbl">متابعة</div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-val green" id="ps-paid">0</div>
+            <div class="sum-lbl">إجمالي المدفوع</div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-val red" id="ps-remain">0</div>
+            <div class="sum-lbl">المتبقي</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- زيارات -->
+      <div id="pat-visits-card" style="display: none" class="card">
+        <div class="card-title">📋 سجل الزيارات</div>
+        <div class="visit-list" id="pat-visits"></div>
+      </div>
+
+      <div id="pat-empty" class="empty">
+        <div class="big">👤</div>
+        <p>ابحث عن مريض بالاسم أو التليفون</p>
+      </div>
+    </div>
+
+    <script>
+      let clinicSettings = {};
+      let currentFinData = null;
+      let currentDebtorsData = null;
+      let currentPatData = null;
+
+      // ── Init ─────────────────────────────────────────────
+      async function init() {
+        const s = await fetch("/api/settings").then((r) => r.json());
+        clinicSettings = s;
+        document.getElementById("clinic-header").textContent =
+          "📊 تقارير — " + (s.clinic_name || "العيادة");
+        // default: الشهر الحالي
+        setToday();
+      }
+
+      function setToday() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, "0");
+        const d = String(now.getDate()).padStart(2, "0");
+        document.getElementById("f-from").value = `${y}-${m}-01`;
+        document.getElementById("f-to").value = `${y}-${m}-${d}`;
+      }
+
+      // ── Tabs ──────────────────────────────────────────────
+      function switchTab(name) {
+        document.querySelectorAll(".tab").forEach((btn) => {
+          const active = btn.getAttribute("onclick") === `switchTab('${name}')`;
+          btn.classList.toggle("active", active);
+        });
+        ["financial", "debtors", "patient"].forEach((n) => {
+          document
+            .getElementById("panel-" + n)
+            .classList.toggle("active", n === name);
+        });
+      }
+
+      // ── Auth ──────────────────────────────────────────────
+      async function logout() {
+        await fetch("/api/logout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role: "reception" }),
+        });
+        location.href = "/login/reception";
+      }
+
+      // ── Quick periods ──────────────────────────────────────
+      function applyQuickPeriod() {
+        const val = document.getElementById("quick-period").value;
+        if (!val) return;
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, "0");
+        const d = String(now.getDate()).padStart(2, "0");
+        const pad = (n) => String(n).padStart(2, "0");
+        let from, to;
+        if (val === "today") {
+          from = to = `${y}-${m}-${d}`;
+        } else if (val === "week") {
+          const w = new Date(now);
+          w.setDate(now.getDate() - 6);
+          from = `${w.getFullYear()}-${pad(w.getMonth() + 1)}-${pad(w.getDate())}`;
+          to = `${y}-${m}-${d}`;
+        } else if (val === "month") {
+          from = `${y}-${m}-01`;
+          to = `${y}-${m}-${d}`;
+        } else if (val === "last_month") {
+          const lm = new Date(y, now.getMonth() - 1, 1);
+          const le = new Date(y, now.getMonth(), 0);
+          from = `${lm.getFullYear()}-${pad(lm.getMonth() + 1)}-01`;
+          to = `${le.getFullYear()}-${pad(le.getMonth() + 1)}-${pad(le.getDate())}`;
+        } else if (val === "year") {
+          from = `${y}-01-01`;
+          to = `${y}-${m}-${d}`;
+        }
+        document.getElementById("f-from").value = from;
+        document.getElementById("f-to").value = to;
+        loadFinancial();
+      }
+
+      // ── Financial Report ──────────────────────────────────
+      async function loadFinancial() {
+        const from = document.getElementById("f-from").value;
+        const to = document.getElementById("f-to").value;
+        if (!from || !to) {
+          alert("ادخل الفترة الزمنية");
+          return;
+        }
+
+        document.getElementById("fin-empty").style.display = "none";
+        document.getElementById("fin-summary").style.display = "none";
+        document.getElementById("fin-days-card").style.display = "none";
+        document.getElementById("fin-table-card").style.display = "none";
+
+        const data = await fetch(
+          `/api/reports/financial?from=${from}&to=${to}`,
+        ).then((r) => r.json());
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        currentFinData = data;
+
+        // Summary
+        document.getElementById("fs-total").textContent = data.total;
+        document.getElementById("fs-new").textContent = data.new_count;
+        document.getElementById("fs-followup").textContent =
+          data.followup_count;
+        document.getElementById("fs-paid").textContent =
+          data.total_paid.toLocaleString("ar-EG");
+        document.getElementById("fs-remain").textContent =
+          data.remaining.toLocaleString("ar-EG");
+        document.getElementById("fin-summary").style.display = "block";
+
+        if (!data.total) {
+          document.getElementById("fin-empty").style.display = "block";
+          document.getElementById("fin-empty").querySelector("p").textContent =
+            "لا يوجد زيارات في هذه الفترة";
+          return;
+        }
+
+        // Day breakdown
+        const daysBox = document.getElementById("fin-days");
+        daysBox.innerHTML = data.by_day
+          .map(
+            (d) => `
+    <div class="day-row" onclick="filterByDay('${d.date}')">
+      <div class="dr-date">${formatDate(d.date)}</div>
+      <div class="dr-count">${d.count} مريض (${d.new}🆕 ${d.followup}🔄)</div>
+      <div class="dr-money">${d.paid.toLocaleString("ar-EG")} ج</div>
+      ${d.price - d.paid > 0 ? `<div class="dr-remain">متبقي: ${(d.price - d.paid).toLocaleString("ar-EG")} ج</div>` : '<div style="font-size:.78rem;color:var(--success)">✅ مكتمل</div>'}
+    </div>`,
+          )
+          .join("");
+        document.getElementById("fin-days-card").style.display = "block";
+
+        // Table - all visits
+        renderFinTable(
+          data.visits,
+          `تفاصيل الزيارات — ${formatDate(from)} إلى ${formatDate(to)}`,
+        );
+        document.getElementById("btn-print-fin").style.display = "";
+
+        // print header
+        const cn = clinicSettings.clinic_name || "العيادة";
+        document.getElementById("fin-print-title").textContent =
+          `التقرير المالي — ${cn}`;
+        document.getElementById("fin-print-sub").textContent =
+          `من ${formatDate(from)} إلى ${formatDate(to)} | إجمالي: ${data.total} مريض | محصّل: ${data.total_paid} ج | متبقي: ${data.remaining} ج`;
+      }
+
+      function filterByDay(date) {
+        document.querySelectorAll(".day-row").forEach((r) => {
+          r.classList.toggle(
+            "active",
+            r.querySelector(".dr-date").textContent === formatDate(date),
+          );
+        });
+        const visits = currentFinData.visits.filter((v) => v.date === date);
+        const dayData = currentFinData.by_day.find((d) => d.date === date);
+        renderFinTable(
+          visits,
+          `تفاصيل يوم ${formatDate(date)} — ${dayData?.count || 0} مريض`,
+        );
+      }
+
+      function renderFinTable(visits, title) {
+        document.getElementById("fin-table-title").textContent = title;
+        const tbody = document.getElementById("fin-tbody");
+        if (!visits.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;">لا يوجد زيارات</td></tr>';
+        } else {
+          tbody.innerHTML = visits
+            .map((v, i) => {
+              const remain = v.price - v.paid;
+              return `<tr>
+        <td>${i + 1}</td>
+        <td>${v.date}</td>
+        <td><strong>${v.name}</strong>${v.phone ? `<div style="font-size:.73rem;color:var(--muted)">${v.phone}</div>` : ""}</td>
+        <td><span class="${v.visit_type === "new" ? "t-new" : "t-followup"}">${v.visit_type === "new" ? "🆕 جديد" : "🔄 متابعة"}</span></td>
+        <td class="col-diag" style="font-size:.8rem;color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.diagnosis || "—"}</td>
+        <td>${v.price} ج</td>
+        <td class="t-paid">${v.paid} ج</td>
+        <td class="t-remain ${remain > 0 ? "has" : "zero"}">${remain > 0 ? remain + " ج" : "✅"}</td>
+      </tr>`;
+            })
+            .join("");
+        }
+        document.getElementById("fin-table-card").style.display = "block";
+      }
+
+      // ── Debtors Report ───────────────────────────────────
+      async function loadDebtors() {
+        const minBalance = Math.max(
+          1,
+          parseInt(document.getElementById("d-min-balance").value || "1", 10),
+        );
+        const q = document.getElementById("d-query").value.trim();
+
+        document.getElementById("deb-empty").style.display = "none";
+        document.getElementById("deb-summary").style.display = "none";
+        document.getElementById("deb-table-card").style.display = "none";
+
+        const data = await fetch(
+          `/api/reports/debtors?min_balance=${minBalance}&q=${encodeURIComponent(q)}`,
+        ).then((r) => r.json());
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        currentDebtorsData = data;
+
+        document.getElementById("ds-count").textContent = data.total_patients;
+        document.getElementById("ds-paid").textContent =
+          data.total_paid.toLocaleString("ar-EG");
+        document.getElementById("ds-charged").textContent =
+          data.total_charged.toLocaleString("ar-EG");
+        document.getElementById("ds-balance").textContent =
+          data.total_debt.toLocaleString("ar-EG");
+        document.getElementById("deb-summary").style.display = "block";
+
+        if (!data.total_patients) {
+          document.getElementById("deb-empty").style.display = "block";
+          document.getElementById("deb-empty").querySelector("p").textContent =
+            "لا يوجد مرضى عليهم مديونية بهذه الشروط";
+          return;
+        }
+
+        const tbody = document.getElementById("deb-tbody");
+        tbody.innerHTML = data.debtors
+          .map(
+            (p, i) => `<tr>
+        <td>${i + 1}</td>
+        <td><strong>${p.name}</strong>${p.phone ? `<div style="font-size:.73rem;color:var(--muted)">${p.phone}</div>` : ""}</td>
+        <td>${p.done_visits}</td>
+        <td>${p.total_charged.toLocaleString("ar-EG")} ج</td>
+        <td class="t-paid">${p.total_paid.toLocaleString("ar-EG")} ج</td>
+        <td class="t-remain has">${p.balance.toLocaleString("ar-EG")} ج</td>
+        <td>${p.last_visit_date || "—"}</td>
+      </tr>`,
+          )
+          .join("");
+
+        document.getElementById("deb-table-card").style.display = "block";
+        document.getElementById("btn-print-deb").style.display = "";
+
+        const cn = clinicSettings.clinic_name || "العيادة";
+        document.getElementById("deb-print-title").textContent =
+          `تقرير المرضى المدينين — ${cn}`;
+        document.getElementById("deb-print-sub").textContent =
+          `عدد المرضى: ${data.total_patients} | إجمالي المتبقي: ${data.total_debt} ج | أقل مديونية: ${data.min_balance} ج${q ? " | بحث: " + q : ""}`;
+      }
+
+      // ── Patient Report ────────────────────────────────────
+      let pSearchTimer = null;
+      document
+        .getElementById("p-search")
+        .addEventListener("input", function () {
+          clearTimeout(pSearchTimer);
+          const q = this.value.trim();
+          if (q.length < 2) {
+            document
+              .getElementById("p-search-results")
+              .classList.remove("show");
+            return;
+          }
+          pSearchTimer = setTimeout(() => doPatientSearch(q), 300);
+        });
+      document.getElementById("p-search").addEventListener("blur", () => {
+        setTimeout(
+          () =>
+            document
+              .getElementById("p-search-results")
+              .classList.remove("show"),
+          200,
+        );
+      });
+
+      async function doPatientSearch(q) {
+        const res = await fetch(
+          "/api/patients/search?q=" + encodeURIComponent(q),
+        ).then((r) => r.json());
+        const box = document.getElementById("p-search-results");
+        if (!res.length) {
+          box.classList.remove("show");
+          return;
+        }
+        box.innerHTML = res
+          .map(
+            (p) => `
+    <div class="search-item" onclick="loadPatientReport(${p.id})">
+      <div>
+        <div class="si-name">${p.name}</div>
+        <div class="si-sub">${p.phone || "بدون تليفون"}${p.address ? " • " + p.address : ""}</div>
+      </div>
+    </div>`,
+          )
+          .join("");
+        box.classList.add("show");
+      }
+
+      async function loadPatientReport(pid) {
+        document.getElementById("p-search-results").classList.remove("show");
+        document.getElementById("pat-empty").style.display = "none";
+        document.getElementById("pat-profile").style.display = "none";
+        document.getElementById("pat-summary").style.display = "none";
+        document.getElementById("pat-visits-card").style.display = "none";
+
+        const data = await fetch(`/api/reports/patient?patient_id=${pid}`).then(
+          (r) => r.json(),
+        );
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        currentPatData = data;
+
+        const p = data.patient;
+        document.getElementById("p-search").value = p.name;
+
+        // Profile
+        document.getElementById("pat-profile").innerHTML = `
+    <div class="patient-profile">
+      <div class="pp-avatar">${p.name.charAt(0)}</div>
+      <div>
+        <div class="pp-name">${p.name}</div>
+        <div class="pp-sub">${p.phone || ""}${p.address ? " • " + p.address : ""}</div>
+        <div class="pp-tags">
+          <span class="pp-tag">📅 منذ: ${p.created_at?.split(" ")[0] || "—"}</span>
+          <span class="pp-tag">📋 ${data.total_visits} زيارة</span>
+        </div>
+      </div>
+    </div>`;
+        document.getElementById("pat-profile").style.display = "block";
+
+        // Summary
+        document.getElementById("ps-visits").textContent = data.total_visits;
+        document.getElementById("ps-new").textContent = data.visits.filter(
+          (v) => v.visit_type === "new",
+        ).length;
+        document.getElementById("ps-followup").textContent = data.visits.filter(
+          (v) => v.visit_type === "followup",
+        ).length;
+        document.getElementById("ps-paid").textContent =
+          data.total_paid.toLocaleString("ar-EG");
+        document.getElementById("ps-remain").textContent =
+          data.remaining.toLocaleString("ar-EG");
+        document.getElementById("pat-summary").style.display = "block";
+
+        // Visits
+        if (!data.visits.length) {
+          document.getElementById("pat-visits-card").innerHTML =
+            '<div class="empty"><div class="big">📋</div><p>لا يوجد زيارات مسجلة</p></div>';
+        } else {
+          document.getElementById("pat-visits").innerHTML = data.visits
+            .map((v, i) => {
+              const remain = v.price - v.paid;
+              return `<div class="visit-card">
+        <div class="visit-card-header" onclick="toggleVisit(this)">
+          <div class="vc-date">📅 ${v.date}</div>
+          <span class="${v.visit_type === "new" ? "t-new" : "t-followup"} vc-type">${v.visit_type === "new" ? "🆕 جديد" : "🔄 متابعة"}</span>
+          <div class="vc-price">${v.price} ج</div>
+          <div class="vc-remain ${remain > 0 ? "has" : "zero"}">${remain > 0 ? "متبقي " + remain + " ج" : "✅ مكتمل"}</div>
+        </div>
+        <div class="visit-card-body">
+          ${v.diagnosis ? `<div class="vb-field diag-line"><strong>🩺 التشخيص</strong>${v.diagnosis}</div>` : ""}
+          ${v.prescription ? `<div class="vb-field"><strong>💊 الوصفة</strong>${v.prescription}</div>` : ""}
+          ${v.notes ? `<div class="vb-field"><strong>📝 ملاحظات</strong>${v.notes}</div>` : ""}
+          <div class="vb-field"><strong>💰 الحساب</strong>السعر: ${v.price} ج — مدفوع: ${v.paid} ج — متبقي: <span class="${remain > 0 ? "" : ""}">‏${remain} ج</span></div>
+        </div>
+      </div>`;
+            })
+            .join("");
+        }
+        document.getElementById("pat-visits-card").style.display = "block";
+        document.getElementById("btn-print-pat").style.display = "";
+
+        // print header
+        const cn = clinicSettings.clinic_name || "العيادة";
+        document.getElementById("pat-print-title").textContent =
+          `تقرير مريض — ${p.name}`;
+        document.getElementById("pat-print-sub").textContent =
+          `${cn} | ${data.total_visits} زيارة | مدفوع: ${data.total_paid} ج | متبقي: ${data.remaining} ج`;
+      }
+
+      function toggleVisit(header) {
+        const body = header.nextElementSibling;
+        body.classList.toggle("show");
+      }
+
+      // ── Print ──────────────────────────────────────────────
+      function printFinancial() {
+        const from = document.getElementById("f-from").value;
+        const to = document.getElementById("f-to").value;
+        const cn = clinicSettings.clinic_name || "العيادة";
+        const old = document.title;
+        document.title = `تقرير مالي ${cn} - ${from} الى ${to}`;
+        window.print();
+        document.title = old;
+      }
+
+      function printPatient() {
+        const name = currentPatData?.patient?.name || "مريض";
+        const cn = clinicSettings.clinic_name || "العيادة";
+        const old = document.title;
+        document.title = `تقرير ${name} - ${cn}`;
+        window.print();
+        document.title = old;
+      }
+
+      function printDebtors() {
+        const cn = clinicSettings.clinic_name || "العيادة";
+        const old = document.title;
+        document.title = `تقرير المرضى المدينين - ${cn}`;
+        window.print();
+        document.title = old;
+      }
+
+      // ── Helpers ───────────────────────────────────────────
+      function formatDate(d) {
+        if (!d) return "";
+        const [y, m, day] = d.split("-");
+        const months = [
+          "",
+          "يناير",
+          "فبراير",
+          "مارس",
+          "إبريل",
+          "مايو",
+          "يونيو",
+          "يوليو",
+          "أغسطس",
+          "سبتمبر",
+          "أكتوبر",
+          "نوفمبر",
+          "ديسمبر",
+        ];
+        return `${parseInt(day)} ${months[parseInt(m)]} ${y}`;
+      }
+
+      init();
+    </script>
+  </body>
+</html>

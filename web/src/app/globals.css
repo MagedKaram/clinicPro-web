@@ -1,0 +1,220 @@
+@import "tailwindcss";
+
+:root {
+  --font-cairo:
+    "Cairo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial,
+    "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+
+  /* Reception + Reports theme tokens (UI Phase) */
+  --rec-primary: #0a5c8a;
+  --rec-primary-light: #1a7ab5;
+  --rec-accent: #00c9b1;
+  --rec-bg: #f0f4f8;
+  --rec-card: #ffffff;
+  --rec-text: #1a2636;
+  --rec-muted: #7a8fa6;
+  --rec-border: #dce5ef;
+  --rec-new: #0a5c8a;
+  --rec-followup: #00897b;
+
+  /* Derived soft surfaces (avoid hard-coded JSX colors) */
+  --rec-soft-primary: color-mix(in srgb, var(--rec-primary) 10%, white);
+  --rec-soft-primary-2: color-mix(in srgb, var(--rec-primary) 18%, white);
+  --rec-soft-followup: color-mix(in srgb, var(--rec-followup) 12%, white);
+  --rec-soft-accent: color-mix(in srgb, var(--rec-accent) 14%, white);
+
+  /* Semantic */
+  --success: #2e7d32;
+  --warning: #f59e0b;
+  --danger: #e53935;
+
+  --success-soft: color-mix(in srgb, var(--success) 14%, white);
+  --warning-soft: color-mix(in srgb, var(--warning) 18%, white);
+  --danger-soft: color-mix(in srgb, var(--danger) 14%, white);
+
+  --warning-ink: color-mix(in srgb, var(--warning) 55%, black);
+  --warning-ink-strong: color-mix(in srgb, var(--warning) 68%, black);
+
+  /* Shadows */
+  --rec-shadow: 0 4px 24px rgba(10, 92, 138, 0.1);
+  --header-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+
+  /* Display theme tokens (UI Phase) */
+  --dis-bg: #050e1a;
+  --dis-accent: #00e5cc;
+  --dis-accent-2: #f59e0b;
+  --dis-text: #ffffff;
+  --dis-muted: color-mix(in srgb, var(--dis-text) 45%, transparent);
+  --dis-card: color-mix(in srgb, var(--dis-text) 5%, transparent);
+  --dis-border: color-mix(in srgb, var(--dis-text) 8%, transparent);
+  --dis-topbar: color-mix(in srgb, black 30%, transparent);
+
+  /* Doctor theme tokens (UI Phase) */
+  --doc-bg: #0d1f33;
+  --doc-card: #132840;
+  --doc-card-2: #1a3455;
+  --doc-text: #e8f0f8;
+  --doc-muted: #6b8aaa;
+  --doc-border: #1e3d5c;
+  --doc-accent: #00c9b1;
+  --doc-accent-2: #f59e0b;
+  --doc-new: #3b9eed;
+  --doc-followup: #00c9b1;
+  --doc-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+@theme inline {
+  /* Map tokens into Tailwind theme values */
+  --color-rec-primary: var(--rec-primary);
+  --color-rec-primary-light: var(--rec-primary-light);
+  --color-rec-accent: var(--rec-accent);
+  --color-rec-bg: var(--rec-bg);
+  --color-rec-card: var(--rec-card);
+  --color-rec-text: var(--rec-text);
+  --color-rec-muted: var(--rec-muted);
+  --color-rec-border: var(--rec-border);
+  --color-rec-new: var(--rec-new);
+  --color-rec-followup: var(--rec-followup);
+  --color-rec-soft-primary: var(--rec-soft-primary);
+  --color-rec-soft-primary-2: var(--rec-soft-primary-2);
+  --color-rec-soft-followup: var(--rec-soft-followup);
+  --color-rec-soft-accent: var(--rec-soft-accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-success-soft: var(--success-soft);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning-ink: var(--warning-ink);
+  --color-warning-ink-strong: var(--warning-ink-strong);
+
+  --font-sans: var(--font-cairo);
+
+  --color-dis-bg: var(--dis-bg);
+  --color-dis-accent: var(--dis-accent);
+  --color-dis-accent-2: var(--dis-accent-2);
+  --color-dis-text: var(--dis-text);
+  --color-dis-muted: var(--dis-muted);
+  --color-dis-card: var(--dis-card);
+  --color-dis-border: var(--dis-border);
+  --color-dis-topbar: var(--dis-topbar);
+
+  --color-doc-bg: var(--doc-bg);
+  --color-doc-card: var(--doc-card);
+  --color-doc-card-2: var(--doc-card-2);
+  --color-doc-text: var(--doc-text);
+  --color-doc-muted: var(--doc-muted);
+  --color-doc-border: var(--doc-border);
+  --color-doc-accent: var(--doc-accent);
+  --color-doc-accent-2: var(--doc-accent-2);
+  --color-doc-new: var(--doc-new);
+  --color-doc-followup: var(--doc-followup);
+}
+
+@utility shadow-rec {
+  box-shadow: var(--rec-shadow);
+}
+
+@utility shadow-header {
+  box-shadow: var(--header-shadow);
+}
+
+@utility shadow-doc {
+  box-shadow: var(--doc-shadow);
+}
+
+@utility max-w-panel {
+  max-width: 1100px;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--rec-bg);
+  color: var(--rec-text);
+}
+
+.doc-shell {
+  background: var(--doc-bg);
+  color: var(--doc-text);
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+}
+
+.dis-shell {
+  background: var(--dis-bg);
+  color: var(--dis-text);
+  overflow: hidden;
+}
+
+.dis-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 80% 50% at 50% -20%,
+      color-mix(in srgb, var(--dis-accent) 8%, transparent) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 50% 30% at 80% 80%,
+      color-mix(in srgb, var(--dis-accent-2) 5%, transparent) 0%,
+      transparent 60%
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dis-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--dis-text) 3%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes dis-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+}
+
+.dis-pulse-dot {
+  animation: dis-pulse 2s infinite;
+}
+
+@keyframes dis-ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.dis-ticker-track {
+  animation: dis-ticker 28s linear infinite;
+}
+
+.dis-current-number {
+  text-shadow:
+    0 0 60px color-mix(in srgb, var(--dis-accent) 40%, transparent),
+    0 0 120px color-mix(in srgb, var(--dis-accent) 15%, transparent);
+}

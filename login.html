@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الدخول</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: #050e1a;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,180,160,0.12) 0%, transparent 70%);
+    pointer-events:none;
+  }
+
+  .box {
+    background: #0d1e30;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 24px;
+    padding: 48px 44px;
+    width: 380px;
+    text-align: center;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  .icon { font-size: 3.2rem; margin-bottom: 12px; }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 36px;
+  }
+
+  label {
+    display: block;
+    text-align: right;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  input[type="password"] {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 1.2rem;
+    color: #fff;
+    letter-spacing: 6px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 24px;
+  }
+  input[type="password"]:focus {
+    border-color: #00c9b1;
+    background: rgba(0,201,177,0.05);
+  }
+  input[type="password"]::placeholder {
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.2);
+  }
+
+  .btn {
+    width: 100%;
+    padding: 15px;
+    background: #00c9b1;
+    color: #051a14;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+
+  .error {
+    margin-top: 16px;
+    padding: 10px;
+    background: rgba(229,57,53,0.12);
+    border: 1px solid rgba(229,57,53,0.3);
+    border-radius: 10px;
+    color: #ef9a9a;
+    font-size: 0.88rem;
+    display: none;
+  }
+  .error.show { display: block; }
+
+  .shake {
+    animation: shake 0.4s ease;
+  }
+  @keyframes shake {
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-8px)}
+    40%{transform:translateX(8px)}
+    60%{transform:translateX(-5px)}
+    80%{transform:translateX(5px)}
+  }
+</style>
+</head>
+<body>
+
+<div class="box" id="box">
+  <div class="icon" id="role-icon">🏥</div>
+  <h1 id="role-title">تسجيل الدخول</h1>
+  <div class="subtitle" id="role-subtitle">أدخل كلمة السر للمتابعة</div>
+
+  <label>كلمة السر</label>
+  <input type="password" id="pw" placeholder="● ● ● ●" autofocus>
+
+  <button class="btn" onclick="doLogin()">دخول</button>
+
+  <div class="error" id="err">❌ كلمة السر غلط، حاول مرة تانية</div>
+</div>
+
+<script>
+  // get role from URL
+  const role = location.pathname.split('/').pop();
+
+  if (role === 'doctor') {
+    document.getElementById('role-icon').textContent = '👨‍⚕️';
+    document.getElementById('role-title').textContent = 'لوحة الدكتور';
+    document.getElementById('role-subtitle').textContent = 'أدخل باسورد الدكتور';
+  } else {
+    document.getElementById('role-icon').textContent = '🖥️';
+    document.getElementById('role-title').textContent = 'الاستقبال';
+    document.getElementById('role-subtitle').textContent = 'أدخل باسورد الاستقبال';
+  }
+
+  document.getElementById('pw').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  async function doLogin() {
+    const pw  = document.getElementById('pw').value;
+    const err = document.getElementById('err');
+    const box = document.getElementById('box');
+
+    const res  = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role, password: pw })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      window.location.href = '/' + role;
+    } else {
+      err.classList.add('show');
+      box.classList.add('shake');
+      document.getElementById('pw').value = '';
+      setTimeout(() => box.classList.remove('shake'), 400);
+    }
+  }
+</script>
+</body>
+</html>

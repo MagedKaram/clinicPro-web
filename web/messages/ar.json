@@ -1,0 +1,214 @@
+{
+  "reception": {
+    "title": {
+      "default": "🏥 الاستقبال",
+      "withClinic": "🏥 {clinicName}"
+    },
+    "nav": {
+      "reports": "📊 التقارير",
+      "display": "📺 شاشة الانتظار",
+      "doctor": "👨‍⚕️ الدكتور",
+      "endDay": "🌙 إنهاء اليوم",
+      "logout": "خروج"
+    },
+    "tabs": {
+      "queue": "📋 تسجيل المرضى",
+      "report": "📊 التقرير اليومي",
+      "settings": "⚙️ الإعدادات"
+    },
+    "balanceBar": {
+      "title": "💰 متبقيات اليوم:",
+      "total": "إجمالي",
+      "paid": "مدفوع",
+      "remaining": "متبقي",
+      "refresh": "🔄 تحديث",
+      "currency": "ج"
+    },
+    "queue": {
+      "title": "قائمة الانتظار",
+      "current": "الدور الحالي",
+      "waiting": "في الانتظار",
+      "todayBilling": "حسابات اليوم",
+      "empty": "لا يوجد مرضى حالياً",
+      "serving": "الحالي"
+    },
+    "register": {
+      "title": "تسجيل مريض",
+      "search": {
+        "label": "بحث عن مريض موجود",
+        "placeholder": "ابحث بالاسم أو التليفون...",
+        "badge": "موجود",
+        "hint": "أو اكتب بيانات مريض جديد أدناه"
+      },
+      "selected": {
+        "cancel": "✕ إلغاء"
+      },
+      "fields": {
+        "fullName": "الاسم الكامل *",
+        "fullNamePlaceholder": "اسم المريض كاملاً",
+        "phone": "رقم التليفون",
+        "phonePlaceholder": "01xxxxxxxxx",
+        "address": "العنوان",
+        "addressPlaceholder": "المدينة / الحي"
+      },
+      "visitType": {
+        "label": "نوع الزيارة",
+        "new": "🆕 كشف جديد",
+        "followup": "🔄 متابعة",
+        "newShort": "جديد",
+        "followupShort": "متابعة"
+      },
+      "submit": "✅ تسجيل وإصدار الدور"
+    },
+    "ticket": {
+      "label": "رقم الدور",
+      "waitingAhead": "أمامك {count} شخص",
+      "print": "🖨️ طباعة الورقة"
+    },
+    "report": {
+      "refresh": "🔄 تحديث",
+      "print": "🖨️ طباعة",
+      "summary": {
+        "totalPatients": "إجمالي المرضى",
+        "new": "كشف جديد",
+        "followup": "متابعة",
+        "paid": "تم تحصيله"
+      },
+      "title": "تقرير اليوم",
+      "table": {
+        "noData": "لا يوجد بيانات",
+        "colIndex": "#",
+        "colName": "الاسم",
+        "colType": "النوع",
+        "colDiagnosis": "التشخيص",
+        "colPrice": "السعر",
+        "colPaid": "المدفوع",
+        "colRemaining": "المتبقي"
+      }
+    },
+    "settings": {
+      "title": "إعدادات العيادة",
+      "fields": {
+        "clinicName": "اسم العيادة",
+        "doctorName": "اسم الدكتور",
+        "phone": "التليفون",
+        "address": "العنوان",
+        "priceNew": "سعر الكشف الجديد (جنيه)",
+        "priceFollowup": "سعر المتابعة (جنيه)"
+      },
+      "save": "💾 حفظ",
+      "saved": "✅ تم الحفظ!"
+    },
+    "alerts": {
+      "missingName": "من فضلك اكتب الاسم الكامل",
+      "endDayConfirm": "⚠️ هل أنت متأكد من إنهاء اليوم؟\n\nسيتم:\n• مسح قائمة الانتظار الحالية\n• إعادة تعيين أرقام التذاكر\n• البدء من جديد غداً\n\nتأكد من تسجيل كل المدفوعات قبل الإنهاء!"
+    }
+  },
+  "common": {
+    "comingSoon": "قريباً",
+    "pageTitles": {
+      "display": "شاشة العرض",
+      "doctor": "الدكتور",
+      "reports": "التقارير",
+      "login": "تسجيل الدخول"
+    }
+  },
+  "display": {
+    "title": "شاشة الانتظار",
+    "comingSoon": "قريباً",
+    "topbar": {
+      "systemName": "نظام الانتظار الذكي"
+    },
+    "nowServing": {
+      "label": "يُخدم الآن",
+      "waitingFirst": "في انتظار أول مريض",
+      "yourTurn": "دورك الآن"
+    },
+    "waiting": {
+      "title": "في الانتظار",
+      "subtitle": "يرجى الانتظار حتى ظهور رقمك",
+      "empty": "لا يوجد مرضى في الانتظار حالياً",
+      "next": "التالي"
+    },
+    "visitType": {
+      "new": "🆕 كشف جديد",
+      "followup": "🔄 متابعة"
+    },
+    "ticker": {
+      "text": "يرجى الانتباه لرقمك على الشاشة • تأكد من تسجيل بياناتك عند الاستقبال • نتمنى لك سرعة الشفاء • يرجى الالتزام بالدور • شكراً لحضوركم"
+    }
+  },
+  "doctor": {
+    "comingSoon": "قريباً",
+    "title": {
+      "default": "👨‍⚕️ لوحة الدكتور",
+      "withDoctor": "👨‍⚕️ د. {doctorName}"
+    },
+    "nav": {
+      "reception": "الاستقبال",
+      "display": "شاشة الانتظار",
+      "endDay": "🌙 إنهاء اليوم",
+      "logout": "خروج"
+    },
+    "tabs": {
+      "exam": "🏥 الكشف",
+      "search": "🔍 البحث عن مريض",
+      "report": "📊 التقرير"
+    },
+    "current": {
+      "title": "المريض الحالي"
+    },
+    "queue": {
+      "title": "قائمة الانتظار",
+      "empty": "لا يوجد مرضى في الانتظار",
+      "next": "التالي"
+    },
+    "visitType": {
+      "new": "🆕 جديد",
+      "followup": "🔄 متابعة"
+    },
+    "actions": {
+      "callNext": "استدعاء التالي ←",
+      "finish": "✅ إنهاء الكشف وإرسال الحساب"
+    },
+    "stats": {
+      "serving": "يُخدم",
+      "waiting": "انتظار",
+      "next": "التالي"
+    },
+    "empty": {
+      "noCurrent": "لا يوجد مريض حالي — اضغط استدعاء التالي"
+    },
+    "form": {
+      "title": "بيانات الكشف",
+      "diagnosis": "التشخيص",
+      "diagnosisPlaceholder": "اكتب التشخيص هنا...",
+      "prescription": "الروشتة",
+      "prescriptionPlaceholder": "اكتب الروشتة هنا...",
+      "notes": "ملاحظات",
+      "notesPlaceholder": "اكتب أي ملاحظات إضافية...",
+      "price": "السعر",
+      "pricePlaceholder": "0",
+      "extraCharge": "إضافة مبلغ زيادة",
+      "extraChargePlaceholder": "0",
+      "addExtra": "إضافة",
+      "currency": "ج"
+    },
+    "search": {
+      "title": "بحث عن مريض",
+      "placeholder": "ابحث بالاسم أو التليفون...",
+      "empty": "لا يوجد نتائج"
+    },
+    "alerts": {
+      "endDayConfirm": "⚠️ هل أنت متأكد من إنهاء اليوم؟\n\nسيتم مسح قائمة الانتظار والبدء من جديد."
+    }
+  },
+  "reports": {
+    "title": "التقارير",
+    "comingSoon": "قريباً"
+  },
+  "login": {
+    "title": "تسجيل الدخول",
+    "comingSoon": "قريباً"
+  }
+}

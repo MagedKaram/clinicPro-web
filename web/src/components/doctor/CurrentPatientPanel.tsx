@@ -20,6 +20,8 @@ export type CurrentPatientPanelProps = {
   nextTicket: number | null;
   onCallNext: () => void;
   onFinish: () => void;
+  onOpenHistory?: () => void;
+  historyCount?: number;
   busy?: boolean;
   form: VisitFormState;
   onFormChange: (next: VisitFormState) => void;
@@ -79,6 +81,8 @@ export function CurrentPatientPanel({
   nextTicket,
   onCallNext,
   onFinish,
+  onOpenHistory,
+  historyCount,
   busy,
   form,
   onFormChange,
@@ -113,6 +117,22 @@ export function CurrentPatientPanel({
                 <div className="mt-2">
                   <VisitTypePill visitType={patient!.visitType} />
                 </div>
+
+                {typeof historyCount === "number" && historyCount > 0 ? (
+                  <button
+                    type="button"
+                    onClick={onOpenHistory}
+                    disabled={Boolean(busy) || !onOpenHistory}
+                    className={cn(
+                      "mt-3 text-[0.82rem] font-bold text-doc-accent underline underline-offset-4",
+                      "cursor-pointer hover:opacity-90",
+                      (Boolean(busy) || !onOpenHistory) &&
+                        "opacity-50 cursor-not-allowed hover:opacity-50",
+                    )}
+                  >
+                    {t("history.open", { count: historyCount })}
+                  </button>
+                ) : null}
               </div>
             </div>
 

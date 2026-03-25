@@ -72,7 +72,10 @@ export function DisplayClient({ settings, queue }: DisplayClientProps) {
 
   useEffect(() => {
     // Ensure initial state is fresh (in case page stayed open).
-    void refreshQueue();
+    const id = window.setTimeout(() => {
+      void refreshQueue();
+    }, 0);
+    return () => window.clearTimeout(id);
   }, [refreshQueue]);
 
   const { time, date } = useMemo(

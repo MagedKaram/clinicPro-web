@@ -29,11 +29,24 @@
       "current": "Current",
       "waiting": "Waiting",
       "todayBilling": "Today's billing",
+      "openBilling": "Open",
+      "noTodayBilling": "No unpaid billing today",
+      "paidLabel": "{amount} {currency}",
+      "remainingLabel": "Remaining: {amount} {currency}",
       "empty": "No patients right now",
       "serving": "Now"
     },
     "register": {
       "title": "Register Patient",
+      "phoneExists": "This phone is already registered under {name}",
+      "useFile": "Use file",
+      "summary": {
+        "loading": "Loading patient billing...",
+        "remainingTitle": "⚠️ Remaining: {amount} {currency}",
+        "total": "Total visits: {amount} {currency}",
+        "paid": "Paid: {amount} {currency}",
+        "visits": "Visits: {count}"
+      },
       "search": {
         "label": "Search existing patient",
         "placeholder": "Search by name or phone...",
@@ -85,6 +98,25 @@
         "colPaid": "Paid",
         "colRemaining": "Remaining"
       }
+    },
+    "billing": {
+      "title": "💳 Billing",
+      "loading": "Loading billing...",
+      "close": "Close",
+      "ticket": "Ticket #{ticket}",
+      "thisVisitPrice": "Visit price",
+      "thisVisitPaid": "Paid",
+      "thisVisitRemaining": "Remaining",
+      "patientBalanceTitle": "Patient balance",
+      "patientCharged": "Charged",
+      "patientPaid": "Paid",
+      "patientRemaining": "Remaining",
+      "addPayment": "Add payment",
+      "amountPlaceholder": "Amount",
+      "notePlaceholder": "Note (optional)",
+      "fillRemaining": "Fill remaining",
+      "submit": "💰 Record payment",
+      "invalidAmount": "Enter a valid amount"
     },
     "settings": {
       "title": "Clinic settings",
@@ -157,6 +189,23 @@
     },
     "current": {
       "title": "Current patient"
+    },
+    "history": {
+      "open": "Open medical history ({count})",
+      "title": "Medical history",
+      "totalVisits": "Previous visits: {count}",
+      "loading": "Loading medical history...",
+      "empty": "No previous medical history for this patient.",
+      "noDiagnosis": "No diagnosis",
+      "emptyField": "—",
+      "fields": {
+        "diagnosis": "Diagnosis",
+        "prescription": "Prescription",
+        "notes": "Notes",
+        "billing": "Billing"
+      },
+      "billingLine": "Price: {price} | Paid: {paid} | Remaining: {remaining}",
+      "close": "Close"
     },
     "queue": {
       "title": "Queue",

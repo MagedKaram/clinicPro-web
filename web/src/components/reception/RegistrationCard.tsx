@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import type { Patient, VisitType } from "@/types/clinic";
+import type { Patient, PatientBillingSummary, VisitType } from "@/types/clinic";
 import { Card, CardTitle } from "@/components/reception/Card";
 import { TicketArea } from "@/components/reception/TicketArea";
 import { VisitTypeToggle } from "@/components/reception/VisitTypeToggle";
 import { useTranslations } from "next-intl";
+import { getPatientBillingSummaryAction } from "@/lib/actions/clinic";
 
 type RegisterPayload = {
   patientId?: string;
@@ -55,6 +56,8 @@ export function RegistrationCard({
   const t = useTranslations("reception");
   const blurTimeoutRef = useRef<number | null>(null);
 
+  const [submitting, setSubmitting] = useState(false);
+
   const [visitType, setVisitType] = useState<VisitType>("new");
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,6 +67,9 @@ export function RegistrationCard({
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+
+  const [summaryBusy, setSummaryBusy] = useState(false);
+  const [summary, setSummary] = useState<PatientBillingSummary | null>(null);
 
   const [ticketVisible, setTicketVisible] = useState(false);
   const [ticketNumber, setTicketNumber] = useState<number | null>(null);
@@ -86,6 +92,21 @@ export function RegistrationCard({
       })
       .slice(0, 8);
   }, [patients, searchQuery]);
+
+  const phoneMatch = useMemo(() => {
+    if (selectedPatient) return null;
+
+    const normalize = (s: string) => s.replace(/\D/g, "").trim();
+    const q = normalize(phone);
+    if (q.length < 6) return null;
+
+    return (
+      patients.find((p) => {
+        const pPhone = typeof p.phone === "string" ? normalize(p.phone) : "";
+        return pPhone.length > 0 && pPhone === q;
+      }) ?? null
+    );
+  }, [patients, phone, selectedPatient]);
 
   function scheduleHideSearch() {
     if (blurTimeoutRef.current) window.clearTimeout(blurTimeoutRef.current);
@@ -113,15 +134,44 @@ export function RegistrationCard({
     setName("");
     setPhone("");
     setAddress("");
+    setSummary(null);
   }
 
+  useEffect(() => {
+    if (!selectedPatient?.id) {
+      setSummary(null);
+      return;
+    }
+
+    let cancelled = false;
+    setSummaryBusy(true);
+    (async () => {
+      try {
+        const next = await getPatientBillingSummaryAction(selectedPatient.id);
+        if (cancelled) return;
+        setSummary(next);
+      } catch {
+        if (cancelled) return;
+        setSummary(null);
+      } finally {
+        if (!cancelled) setSummaryBusy(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedPatient?.id]);
+
   async function handleRegister() {
-    if (busy) return;
+    if (busy || submitting) return;
     const finalName = name.trim();
     if (!finalName) {
       window.alert(t("alerts.missingName"));
       return;
     }
+
+    setSubmitting(true);
 
     try {
       const { ticket, time, waitingAhead } = await onRegister({
@@ -138,9 +188,16 @@ export function RegistrationCard({
       setTicketType(visitType);
       setTicketTime(time);
       setTicketWaitingAhead(waitingAhead);
+
+      // Reset inputs for the next patient.
+      setSearchQuery("");
+      setIsSearchOpen(false);
+      clearPatient();
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       window.alert(message);
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -205,13 +262,51 @@ export function RegistrationCard({
         <div className="w-10 h-10 rounded-full bg-rec-primary text-rec-card flex items-center justify-center text-[1.1rem] font-black shrink-0">
           {selectedPatient?.name?.trim().at(0) ?? "?"}
         </div>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="font-bold text-[0.95rem]">
             {selectedPatient?.name ?? "—"}
           </div>
           <div className="text-[0.78rem] text-rec-muted">
             {(selectedPatient?.phone ?? "").trim() || "—"}
           </div>
+
+          {selectedPatient ? (
+            <div className="mt-2">
+              {!summary && summaryBusy ? (
+                <div className="text-[0.78rem] text-rec-muted">
+                  {t("register.summary.loading")}
+                </div>
+              ) : summary ? (
+                <div className="bg-warning-soft border border-warning/30 rounded-xl px-3 py-2">
+                  <div className="text-[0.8rem] font-bold text-warning-ink-strong">
+                    {t("register.summary.remainingTitle", {
+                      amount: summary.remaining,
+                      currency: t("balanceBar.currency"),
+                    })}
+                  </div>
+                  <div className="mt-1 text-[0.78rem] text-warning-ink flex flex-wrap gap-x-3 gap-y-1">
+                    <span>
+                      {t("register.summary.total", {
+                        amount: summary.charged,
+                        currency: t("balanceBar.currency"),
+                      })}
+                    </span>
+                    <span>
+                      {t("register.summary.paid", {
+                        amount: summary.paid,
+                        currency: t("balanceBar.currency"),
+                      })}
+                    </span>
+                    <span>
+                      {t("register.summary.visits", {
+                        count: summary.visitsCount,
+                      })}
+                    </span>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
         </div>
         <button
           type="button"
@@ -242,6 +337,23 @@ export function RegistrationCard({
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder={t("register.fields.phonePlaceholder")}
               />
+
+              {phoneMatch ? (
+                <div className="mt-2 rounded-xl border border-warning/30 bg-warning-soft px-3 py-2 text-[0.8rem] text-warning-ink flex items-center gap-2">
+                  <div className="shrink-0">⚠️</div>
+                  <div className="flex-1 min-w-0">
+                    {t("register.phoneExists", { name: phoneMatch.name })}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => selectPatient(phoneMatch)}
+                    disabled={Boolean(busy) || submitting}
+                    className="shrink-0 px-3 py-1 rounded-lg bg-rec-primary text-rec-card text-[0.78rem] font-bold cursor-pointer"
+                  >
+                    {t("register.useFile")}
+                  </button>
+                </div>
+              ) : null}
             </div>
             <div className="mb-4">
               <InputLabel>{t("register.fields.address")}</InputLabel>
@@ -263,7 +375,7 @@ export function RegistrationCard({
       <button
         type="button"
         onClick={handleRegister}
-        disabled={Boolean(busy)}
+        disabled={Boolean(busy) || submitting}
         className="w-full py-3 rounded-xl bg-rec-primary text-rec-card font-bold text-[0.93rem] cursor-pointer transition-colors hover:bg-rec-primary-light"
       >
         {t("register.submit")}

@@ -1,5 +1,69 @@
 # Backend Spec (Phase 2) — Supabase
 
+> هذا الملف يجمع بين: (1) الاسكيما/RPC/RLS (مرجع)، و(2) حالة التنفيذ الحالية في الكود.
+
+---
+
+## Implemented Now (الكود الحالي)
+
+### قراءة البيانات (Server)
+
+- `web/src/lib/data/server.ts`
+  - قراءات الـ queue / settings / reports (حسب ما هو مستخدم في صفحات Server Components)
+
+### كتابة وتشغيل العمليات (Server Actions)
+
+- `web/src/lib/actions/clinic.ts`
+  - `registerVisitAction`: upsert-ish للمريض + `allocate_ticket()` + insert visit
+  - `callNextAction`: RPC `call_next()` لتحديد next visit atomically
+  - `finishVisitAction`: تحديث الزيارة لـ `done` مع diagnosis/prescription/notes/price
+  - `endDayAction`: إنهاء اليوم (إغلاق الحالات المفتوحة + reset counter)
+  - `saveSettingsAction`: تحديث settings
+  - `refreshDailyBalanceAction` / `getQueueStateAction`: refresh سريع للـ UI
+
+### Realtime (Browser)
+
+- `web/src/lib/hooks/useVisitsRealtime.ts`
+  - subscription على `public.visits` مع debounced refresh
+  - polling مُعطّل افتراضيًا (true realtime) إلا إذا تم تمرير `fallbackPollMs`
+
+- `web/src/lib/supabase/client.ts`
+  - singleton browser client لتفادي فتح sockets متعددة
+
+---
+
+## Realtime — تشغيل وحلول مشاكل شائعة
+
+### لازم: publication فيها جدول `visits`
+
+Realtime (postgres_changes) يحتاج الجدول يكون ضمن publication `supabase_realtime`.
+
+```sql
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication where pubname = 'supabase_realtime'
+  ) then
+    create publication supabase_realtime;
+  end if;
+end $$;
+
+alter publication supabase_realtime add table public.visits;
+```
+
+### لو UPDATE مش بيظهر
+
+في بعض الحالات (خصوصًا مع filters أو عدم وجود key مناسب)، Realtime ممكن ما يبعتش payload كفاية للـ UPDATE.
+الحل التشغيلي الأشهر:
+
+```sql
+alter table public.visits replica identity full;
+```
+
+> ملاحظة: ده بيزوّد حجم الـ replication payload. استخدمه فقط عند الحاجة.
+
+---
+
 > الهدف من الملف ده: يبقى “مرجع واحد” لكل الباك-إند اللي هنحتاجه، بحيث لما نبدأ تنفيذ Phase 2 ما نرجعش ندوّر تاني.
 
 ## 0) Scope

@@ -1,6 +1,11 @@
 "use client";
 
-import type { Patient, QueueState, VisitType } from "@/types/clinic";
+import type {
+  DailyVisitRow,
+  Patient,
+  QueueState,
+  VisitType,
+} from "@/types/clinic";
 import { RegistrationCard } from "@/components/reception/RegistrationCard";
 import { Card, CardTitle } from "@/components/reception/Card";
 import { QueueList } from "@/components/reception/QueueList";
@@ -11,6 +16,8 @@ export function QueuePanel({
   onRegister,
   patients,
   busy,
+  todayBillingRows,
+  onOpenBilling,
 }: {
   queueState: QueueState;
   onRegister: (payload: {
@@ -22,6 +29,8 @@ export function QueuePanel({
   }) => Promise<{ ticket: number; time: string; waitingAhead: number }>;
   patients: Patient[];
   busy?: boolean;
+  todayBillingRows: DailyVisitRow[];
+  onOpenBilling: (visitId: string) => void;
 }) {
   const t = useTranslations("reception");
 
@@ -65,9 +74,55 @@ export function QueuePanel({
             />
           </Card>
 
-          {/* UI phase placeholder */}
-          <Card className="hidden">
+          <Card>
             <CardTitle icon="💳">{t("queue.todayBilling")}</CardTitle>
+
+            {!todayBillingRows.length ? (
+              <div className="text-center py-8 text-rec-muted">
+                {t("queue.noTodayBilling")}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 max-h-56 overflow-y-auto">
+                {todayBillingRows.map((r) => {
+                  const remaining = r.price - r.paid;
+                  return (
+                    <div
+                      key={r.id}
+                      className="flex items-center gap-3 p-3 bg-rec-bg rounded-xl"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold text-[0.88rem] truncate">
+                          {r.name}
+                        </div>
+                        <div className="text-[0.78rem] text-rec-muted flex flex-wrap gap-x-3 gap-y-1">
+                          <span>
+                            {t("queue.paidLabel", {
+                              amount: r.paid,
+                              currency: t("balanceBar.currency"),
+                            })}
+                          </span>
+                          <span>
+                            {t("queue.remainingLabel", {
+                              amount: remaining,
+                              currency: t("balanceBar.currency"),
+                            })}
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        disabled={Boolean(busy)}
+                        onClick={() => onOpenBilling(r.id)}
+                        className="px-4 py-2 rounded-xl bg-rec-soft-primary text-rec-primary font-bold text-[0.82rem] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {t("queue.openBilling")}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </Card>
         </div>
       </div>

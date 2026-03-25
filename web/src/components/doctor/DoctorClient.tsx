@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   useTransition,
 } from "react";
@@ -15,6 +16,7 @@ import {
   callNextAction,
   endDayAction,
   finishVisitAction,
+  getPatientFileAction,
   getQueueStateAction,
 } from "@/lib/actions/clinic";
 
@@ -29,6 +31,8 @@ import {
 } from "@/components/doctor/CurrentPatientPanel";
 import { SearchPanel } from "@/components/doctor/SearchPanel";
 import type { VisitFormState } from "@/components/doctor/VisitForm";
+import type { PatientFile } from "@/types/clinic";
+import { MedicalHistoryPopup } from "@/components/doctor/MedicalHistoryPopup";
 
 export type DoctorClientProps = {
   initialSettings: Settings;
@@ -77,6 +81,69 @@ export function DoctorClient({
     return queueState.queue.find((v) => v.status === "serving") ?? null;
   }, [queueState.queue]);
 
+  const servingVisitId = servingVisit?.id ?? null;
+  const servingPatientId = servingVisit?.patientId ?? null;
+  const servingVisitRef = useRef<typeof servingVisit>(servingVisit);
+
+  useEffect(() => {
+    servingVisitRef.current = servingVisit;
+  }, [servingVisit]);
+
+  const [patientFile, setPatientFile] = useState<PatientFile | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyBusy, setHistoryBusy] = useState(false);
+  const [autoOpenedForVisitId, setAutoOpenedForVisitId] = useState<
+    string | null
+  >(null);
+
+  const closeHistory = useCallback(() => {
+    if (historyBusy) return;
+    setHistoryOpen(false);
+  }, [historyBusy]);
+
+  const openHistory = useCallback(() => {
+    if (historyBusy) return;
+    if (!patientFile || patientFile.visits.length === 0) return;
+    setHistoryOpen(true);
+  }, [historyBusy, patientFile]);
+
+  useEffect(() => {
+    if (!servingVisitId || !servingPatientId) {
+      setPatientFile(null);
+      setHistoryOpen(false);
+      setAutoOpenedForVisitId(null);
+      return;
+    }
+
+    let cancelled = false;
+    setHistoryBusy(true);
+    (async () => {
+      try {
+        const file = await getPatientFileAction(
+          servingPatientId,
+          servingVisitId,
+        );
+        if (cancelled) return;
+        setPatientFile(file);
+
+        // Auto-open once per serving visit if history exists.
+        if (file.visits.length > 0 && autoOpenedForVisitId !== servingVisitId) {
+          setHistoryOpen(true);
+          setAutoOpenedForVisitId(servingVisitId);
+        }
+      } catch {
+        if (cancelled) return;
+        setPatientFile(null);
+      } finally {
+        if (!cancelled) setHistoryBusy(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [autoOpenedForVisitId, servingPatientId, servingVisitId]);
+
   const currentPatient: CurrentPatient | null = useMemo(() => {
     if (!servingVisit) return null;
     return {
@@ -93,29 +160,40 @@ export function DoctorClient({
     price: settings.priceNew,
   });
 
+  const formRef = useRef<VisitFormState>(form);
+  const setFormSafe = useCallback((next: VisitFormState) => {
+    formRef.current = next;
+    setForm(next);
+  }, []);
+
   useEffect(() => {
     // Important: only reset form when the serving visit changes.
     // This prevents polling from clobbering doctor's in-progress edits.
-    if (!servingVisit) {
-      setForm({
-        diagnosis: "",
-        prescription: "",
-        notes: "",
-        price: settings.priceNew,
-      });
-      return;
-    }
+    const id = window.setTimeout(() => {
+      const sv = servingVisitRef.current;
+      if (!sv) {
+        setFormSafe({
+          diagnosis: "",
+          prescription: "",
+          notes: "",
+          price: settings.priceNew,
+        });
+        return;
+      }
 
-    setForm({
-      diagnosis: servingVisit.diagnosis ?? "",
-      prescription: servingVisit.prescription ?? "",
-      notes: servingVisit.notes ?? "",
-      price:
-        typeof servingVisit.price === "number" && servingVisit.price > 0
-          ? servingVisit.price
-          : defaultPrice(settings, servingVisit.visitType),
-    });
-  }, [servingVisit?.id, settings]);
+      setFormSafe({
+        diagnosis: sv.diagnosis ?? "",
+        prescription: sv.prescription ?? "",
+        notes: sv.notes ?? "",
+        price:
+          typeof sv.price === "number" && sv.price > 0
+            ? sv.price
+            : defaultPrice(settings, sv.visitType),
+      });
+    }, 0);
+
+    return () => window.clearTimeout(id);
+  }, [servingVisitId, setFormSafe, settings]);
 
   const headerTitle = useMemo(() => {
     const doctorName = settings.doctorName?.trim();
@@ -192,6 +270,8 @@ export function DoctorClient({
     if (isPending) return;
     if (!servingVisit) return;
 
+    const nextForm = formRef.current;
+
     // Optimistic UI: clear serving immediately.
     setQueueState((prev) => ({
       ...prev,
@@ -203,10 +283,10 @@ export function DoctorClient({
       try {
         await finishVisitAction({
           visitId: servingVisit.id,
-          diagnosis: form.diagnosis,
-          prescription: form.prescription,
-          notes: form.notes,
-          price: form.price,
+          diagnosis: nextForm.diagnosis,
+          prescription: nextForm.prescription,
+          notes: nextForm.notes,
+          price: nextForm.price,
         });
       } catch (e) {
         const message = e instanceof Error ? e.message : String(e);
@@ -242,7 +322,9 @@ export function DoctorClient({
                   onFinish={finishVisit}
                   busy={isPending}
                   form={form}
-                  onFormChange={setForm}
+                  onFormChange={setFormSafe}
+                  onOpenHistory={openHistory}
+                  historyCount={patientFile?.visits.length ?? 0}
                 />
                 <QueueSidebar
                   title={t("queue.title")}
@@ -263,7 +345,9 @@ export function DoctorClient({
                   onFinish={finishVisit}
                   busy={isPending}
                   form={form}
-                  onFormChange={setForm}
+                  onFormChange={setFormSafe}
+                  onOpenHistory={openHistory}
+                  historyCount={patientFile?.visits.length ?? 0}
                 />
               </>
             )}
@@ -272,6 +356,15 @@ export function DoctorClient({
       ) : (
         <SearchPanel patients={patients} />
       )}
+
+      {historyOpen ? (
+        <MedicalHistoryPopup
+          open={historyOpen}
+          busy={historyBusy}
+          data={patientFile}
+          onClose={closeHistory}
+        />
+      ) : null}
     </div>
   );
 }

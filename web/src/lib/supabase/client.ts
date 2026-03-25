@@ -7,7 +7,6 @@ import { getSupabaseEnv } from "./env";
 type BrowserClient = ReturnType<typeof createBrowserClient>;
 
 declare global {
-  // eslint-disable-next-line no-var
   var __clinicQueueSupabaseBrowserClient: BrowserClient | undefined;
 }
 

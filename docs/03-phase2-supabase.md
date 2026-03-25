@@ -2,42 +2,110 @@
 
 ## الهدف
 
-- استبدال الـ mock state بـ Supabase (DB + Auth + Realtime).
+- استبدال الـ mock state بـ Supabase (DB + RPC + Realtime).
+- تنفيذ كل الـ flows الأساسية عبر Server Actions.
 
-> التفاصيل الكاملة (Schema/RLS/RPC/Realtime) في: `docs/04-backend-spec.md`.
+> المرجع التفصيلي (Schema/RPC/RLS) في: `docs/04-backend-spec.md`.
 
-## Dependencies
+---
+
+## Dependencies (تم)
 
 - `@supabase/supabase-js`
 - `@supabase/ssr`
 
-## Environment
+---
 
-- `.env.local`
-  - `NEXT_PUBLIC_SUPABASE_URL=...`
-  - `NEXT_PUBLIC_SUPABASE_ANON_KEY=...`
+## Environment (لازم)
 
-## خطوات التنفيذ (مقترحة)
+داخل `web/.env.local`:
 
-1. Schema + Migrations
+- `NEXT_PUBLIC_SUPABASE_URL=...`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY=...`
 
-- جداول أساسية: `patients`, `visits`, `settings`, `queue_state` (أو modeling مناسب).
+Helpers:
 
-2. Data layer
+- `web/src/lib/supabase/env.ts`
 
-- Server fetch للصفحات Server Components.
+---
 
-3. Realtime
+## Schema (تم)
 
-- Subscription لتحديث الـ queue تلقائيًا (بدل mock).
+نفّذ سكريبت الاسكيما:
 
-4. Auth & Roles
+- `docs/05-supabase-phase2-schema.sql`
 
-- حماية routes حسب role: `reception` و`doctor`.
+بيعمل:
 
-## DoD
+- enums: `visit_status`, `visit_type`
+- tables: `patients`, `visits`, `settings`, `payments`, `daily_counters` (+ `profiles` للـ roles لاحقًا)
+- RPCs: `allocate_ticket(date)` + `call_next(date)`
 
-- Reception: تسجيل مريض → يولد Visit/Ticket في DB.
-- Doctor: استدعاء التالي + إنهاء الكشف يحدّث status.
-- Display: يعرض current + waiting من DB مع تحديث realtime.
-- Reports: تعتمد على visits فعليًا.
+---
+
+## Data Layer (قراءة) — تم
+
+قراءات Server Components مع fallback لـ mock أثناء التطوير:
+
+- `web/src/lib/data/server.ts`
+
+---
+
+## Server Actions (كتابة/تشغيل) — تم
+
+كل الـ flows الأساسية موجودة هنا:
+
+- `web/src/lib/actions/clinic.ts`
+
+العمليات:
+
+- `registerVisitAction` (تسجيل مريض + تخصيص ticket + insert visit)
+- `callNextAction` (RPC `call_next`)
+- `finishVisitAction` (update visit status + medical fields + price)
+- `endDayAction` (إغلاق waiting/serving + reset daily counter)
+- `saveSettingsAction` (update settings singleton)
+- `getQueueStateAction` / `refreshDailyBalanceAction` (refresh سريع للـ UI)
+
+---
+
+## Realtime (تم)
+
+Hook موحد للـ subscription على `public.visits`:
+
+- `web/src/lib/hooks/useVisitsRealtime.ts`
+
+ملاحظات مهمة:
+
+- الـ hook realtime-only افتراضيًا (مفيش polling إلا لو مررت `fallbackPollMs`).
+- الاشتراك بدون server-side filter لتفادي فقد UPDATE events في بعض إعدادات replica identity.
+- لو التاب hidden بنؤجل refresh لأول ما يرجع visible.
+
+### تفعيل realtime على Supabase
+
+تأكد إن `public.visits` موجودة في publication `supabase_realtime`.
+
+SQL (اختياري):
+
+```sql
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication where pubname = 'supabase_realtime'
+  ) then
+    create publication supabase_realtime;
+  end if;
+end $$;
+
+alter publication supabase_realtime add table public.visits;
+
+-- لو UPDATE مش بتوصل realtime:
+-- alter table public.visits replica identity full;
+```
+
+---
+
+## Verification (سريع)
+
+- افتح `/reception` و`/doctor` و`/display`.
+- اعمل register من الاستقبال.
+- تأكد إن الدكتور/الشاشة بيتحدثوا لحظيًا بدون refresh.

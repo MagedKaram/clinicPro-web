@@ -29,11 +29,24 @@
       "current": "الدور الحالي",
       "waiting": "في الانتظار",
       "todayBilling": "حسابات اليوم",
+      "openBilling": "فتح",
+      "noTodayBilling": "لا يوجد حسابات غير مكتملة اليوم",
+      "paidLabel": "{amount} {currency}",
+      "remainingLabel": "متبقي: {amount} {currency}",
       "empty": "لا يوجد مرضى حالياً",
       "serving": "الحالي"
     },
     "register": {
       "title": "تسجيل مريض",
+      "phoneExists": "هذا التليفون مسجل باسم {name}",
+      "useFile": "استخدم ملفه",
+      "summary": {
+        "loading": "جاري تحميل حساب المريض...",
+        "remainingTitle": "⚠️ متبقي عليه: {amount} {currency}",
+        "total": "إجمالي زياراته: {amount} {currency}",
+        "paid": "دفع: {amount} {currency}",
+        "visits": "عدد الزيارات: {count}"
+      },
       "search": {
         "label": "بحث عن مريض موجود",
         "placeholder": "ابحث بالاسم أو التليفون...",
@@ -85,6 +98,25 @@
         "colPaid": "المدفوع",
         "colRemaining": "المتبقي"
       }
+    },
+    "billing": {
+      "title": "💳 حساب المريض",
+      "loading": "جاري تحميل الحساب...",
+      "close": "إغلاق",
+      "ticket": "دور #{ticket}",
+      "thisVisitPrice": "سعر الزيارة",
+      "thisVisitPaid": "مدفوع",
+      "thisVisitRemaining": "متبقي",
+      "patientBalanceTitle": "الحساب الكلي",
+      "patientCharged": "إجمالي",
+      "patientPaid": "مدفوع",
+      "patientRemaining": "متبقي",
+      "addPayment": "تسجيل دفعة",
+      "amountPlaceholder": "المبلغ بالجنيه",
+      "notePlaceholder": "ملاحظة (اختياري)",
+      "fillRemaining": "املأ المتبقي",
+      "submit": "💰 تسجيل الدفع",
+      "invalidAmount": "ادخل مبلغ صحيح"
     },
     "settings": {
       "title": "إعدادات العيادة",
@@ -157,6 +189,23 @@
     },
     "current": {
       "title": "المريض الحالي"
+    },
+    "history": {
+      "open": "عرض التاريخ الطبي ({count})",
+      "title": "التاريخ الطبي للمريض",
+      "totalVisits": "عدد الزيارات السابقة: {count}",
+      "loading": "جاري تحميل التاريخ الطبي...",
+      "empty": "لا يوجد تاريخ طبي سابق لهذا المريض.",
+      "noDiagnosis": "بدون تشخيص",
+      "emptyField": "—",
+      "fields": {
+        "diagnosis": "التشخيص",
+        "prescription": "الروشتة",
+        "notes": "ملاحظات",
+        "billing": "الحساب"
+      },
+      "billingLine": "السعر: {price} | المدفوع: {paid} | المتبقي: {remaining}",
+      "close": "إغلاق"
     },
     "queue": {
       "title": "قائمة الانتظار",

@@ -64,7 +64,6 @@ export function useVisitsRealtime({
     // We do a lightweight client-side check instead.
     const effectiveDay = day || todayISODateClient();
 
-    let subscribed = false;
     let pollId: number | null = null;
 
     const onVisibilityChange = () => {
@@ -108,7 +107,6 @@ export function useVisitsRealtime({
       )
       .subscribe((status: string) => {
         if (status === "SUBSCRIBED") {
-          subscribed = true;
           trigger();
         }
 
@@ -117,7 +115,6 @@ export function useVisitsRealtime({
           status === "TIMED_OUT" ||
           status === "CLOSED"
         ) {
-          subscribed = false;
           pendingRefreshRef.current = true;
 
           if (process.env.NODE_ENV !== "production") {
@@ -126,13 +123,13 @@ export function useVisitsRealtime({
         }
       });
 
-    // Fallback polling: if realtime isn't subscribed, still refresh periodically.
-    // This avoids manual refresh when realtime is misconfigured.
+    // Fallback polling: refresh periodically as a safety net.
+    // NOTE: We intentionally do not gate on `subscribed` because a channel can be
+    // SUBSCRIBED while still receiving no events (e.g. table not in publication).
     if (fallbackPollMs > 0) {
       pollId = window.setInterval(
         () => {
           if (document.hidden) return;
-          if (subscribed) return;
           trigger();
         },
         Math.max(2000, fallbackPollMs),

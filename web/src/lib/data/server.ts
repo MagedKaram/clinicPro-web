@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type {
   DailyBalance,
   Patient,
@@ -21,7 +23,6 @@ function warnSupabaseFallback(scope: string, reason: string) {
   if (supabaseFallbackWarned) return;
   supabaseFallbackWarned = true;
   if (process.env.NODE_ENV === "production") return;
-  // eslint-disable-next-line no-console
   console.warn(`[data/server] Supabase fallback (${scope}): ${reason}`);
 }
 
@@ -193,6 +194,8 @@ export async function getQueueStateServer(
       current: serving ? Number(serving.ticket) : null,
       waitingCount: waiting.length,
       waitingPatients: waiting.map((v: any) => ({
+        visitId: String(v.id),
+        patientId: String(v.patient_id),
         ticket: Number(v.ticket),
         name: patientNameById.get(String(v.patient_id)) ?? "",
         visitType: v.visit_type,

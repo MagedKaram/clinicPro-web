@@ -3,13 +3,9 @@
 import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
-import type { VisitType } from "@/types/clinic";
+import type { QueueState, VisitType } from "@/types/clinic";
 
-export type QueueSidebarItem = {
-  ticket: number;
-  name: string;
-  visitType: VisitType;
-};
+export type QueueSidebarItem = QueueState["waitingPatients"][number];
 
 export type QueueSidebarProps = {
   title: string;

@@ -199,6 +199,26 @@ grant execute on function public.call_next(date) to anon, authenticated;
 
 commit;
 
+-- -----------------------------------------------------------------------------
+-- Operational Notes (Optional)
+-- -----------------------------------------------------------------------------
+-- Realtime (postgres_changes) requires the table to be included in publication
+-- `supabase_realtime`. Some projects already have it by default.
+--
+-- do $$
+-- begin
+--   if not exists (
+--     select 1 from pg_publication where pubname = 'supabase_realtime'
+--   ) then
+--     create publication supabase_realtime;
+--   end if;
+-- end $$;
+--
+-- alter publication supabase_realtime add table public.visits;
+--
+-- If UPDATE events are missing / payload is incomplete for realtime subscribers:
+-- alter table public.visits replica identity full;
+
 -- Optional (later): enable RLS + add policies
 -- alter table public.patients enable row level security;
 -- alter table public.visits enable row level security;

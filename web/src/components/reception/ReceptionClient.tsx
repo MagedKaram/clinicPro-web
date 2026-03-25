@@ -1,18 +1,30 @@
 "use client";
 
-import { useCallback, useMemo, useState, useTransition } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { useLocale, useTranslations } from "next-intl";
 import type {
   DailyBalance,
+  DailyVisitRow,
   Patient,
   QueueState,
   Settings,
   VisitType,
+  VisitBilling,
 } from "@/types/clinic";
 
 import {
+  addPaymentAction,
   endDayAction,
+  getDayVisitsAction,
   getQueueStateAction,
+  getVisitBillingAction,
   refreshDailyBalanceAction,
   registerVisitAction,
   saveSettingsAction,
@@ -28,6 +40,7 @@ import { BalanceBar } from "@/components/reception/BalanceBar";
 import { QueuePanel } from "@/components/reception/QueuePanel";
 import { ReportPanel } from "@/components/reception/ReportPanel";
 import { SettingsPanel } from "@/components/reception/SettingsPanel";
+import { BillingPopup } from "@/components/reception/BillingPopup";
 
 export type ReceptionClientProps = {
   initialSettings: Settings;
@@ -56,6 +69,14 @@ export function ReceptionClient({
     useState<DailyBalance>(initialDailyBalance);
   const [patients, setPatients] = useState<Patient[]>(initialPatients);
 
+  const [reportRows, setReportRows] = useState<DailyVisitRow[]>([]);
+  const [isLoadingReport, setIsLoadingReport] = useState(false);
+  const [reportBootstrapped, setReportBootstrapped] = useState(false);
+
+  const [billingOpen, setBillingOpen] = useState(false);
+  const [billingBusy, setBillingBusy] = useState(false);
+  const [billingData, setBillingData] = useState<VisitBilling | null>(null);
+
   const refreshQueue = useCallback(async () => {
     try {
       const nextQueue = await getQueueStateAction();
@@ -74,12 +95,43 @@ export function ReceptionClient({
     }
   }, []);
 
+  const refreshReport = useCallback(async () => {
+    setIsLoadingReport(true);
+    try {
+      const rows = await getDayVisitsAction();
+      setReportRows(rows);
+    } catch {
+      // Silent.
+    } finally {
+      setIsLoadingReport(false);
+      setReportBootstrapped(true);
+    }
+  }, []);
+
   useVisitsRealtime({
     day: new Date().toISOString().slice(0, 10),
+    // Safety net: keep reception in sync even if realtime emits no events.
+    fallbackPollMs: 12000,
     onChange: async () => {
-      await Promise.all([refreshQueue(), refreshBalance()]);
+      await Promise.all([refreshQueue(), refreshBalance(), refreshReport()]);
     },
   });
+
+  useEffect(() => {
+    // Needed for both report tab and "Today's billing" card.
+    void refreshReport();
+  }, [refreshReport]);
+
+  useEffect(() => {
+    if (activeTab !== "report") return;
+    void refreshReport();
+  }, [activeTab, refreshReport]);
+
+  const todayBillingRows = useMemo(() => {
+    return reportRows
+      .filter((r) => r.status === "done" && r.price - r.paid > 0)
+      .slice(0, 6);
+  }, [reportRows]);
 
   const clinicTitle = useMemo(() => {
     const clinicName = settings.clinicName?.trim();
@@ -130,6 +182,101 @@ export function ReceptionClient({
       }
     });
   }
+
+  const openBilling = useCallback(
+    async (visitId: string) => {
+      if (!visitId) return;
+      if (busy) return;
+
+      setBillingOpen(true);
+      setBillingData(null);
+      try {
+        const data = await getVisitBillingAction(visitId);
+        setBillingData(data);
+      } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        window.alert(message);
+        setBillingOpen(false);
+      }
+    },
+    [busy],
+  );
+
+  const doneSeededRef = useRef(false);
+  const knownDoneIdsRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    // Auto-open billing when a visit is newly finished by the doctor.
+    // We seed on first report load to avoid popping existing done visits on page load.
+    if (!reportBootstrapped) return;
+
+    if (!doneSeededRef.current) {
+      knownDoneIdsRef.current = new Set(
+        reportRows.filter((r) => r.status === "done").map((r) => r.id),
+      );
+      doneSeededRef.current = true;
+      return;
+    }
+
+    if (billingOpen || billingBusy || busy) return;
+
+    const candidate = reportRows.find(
+      (r) =>
+        r.status === "done" &&
+        r.price - r.paid > 0 &&
+        !knownDoneIdsRef.current.has(r.id),
+    );
+
+    if (!candidate) return;
+    knownDoneIdsRef.current.add(candidate.id);
+    void openBilling(candidate.id);
+  }, [
+    billingBusy,
+    billingOpen,
+    busy,
+    openBilling,
+    reportBootstrapped,
+    reportRows,
+  ]);
+
+  const closeBilling = useCallback(() => {
+    if (billingBusy) return;
+    setBillingOpen(false);
+  }, [billingBusy]);
+
+  const submitPayment = useCallback(
+    async (payload: { amount: number; note: string }) => {
+      if (!billingData) {
+        window.alert(t("billing.loading"));
+        return;
+      }
+      if (billingBusy) return;
+      if (!payload.amount || payload.amount <= 0) {
+        window.alert(t("billing.invalidAmount"));
+        return;
+      }
+
+      setBillingBusy(true);
+      try {
+        const next = await addPaymentAction({
+          patientId: billingData.patient.id,
+          visitId: billingData.visitId,
+          amount: payload.amount,
+          note: payload.note,
+        });
+        setBillingData(next);
+        await Promise.all([refreshBalance(), refreshReport(), refreshQueue()]);
+        setBillingOpen(false);
+      } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        window.alert(message);
+        await Promise.all([refreshBalance(), refreshReport(), refreshQueue()]);
+      } finally {
+        setBillingBusy(false);
+      }
+    },
+    [billingBusy, billingData, refreshBalance, refreshQueue, refreshReport, t],
+  );
 
   async function registerPatient(payload: {
     patientId?: string;
@@ -248,10 +395,19 @@ export function ReceptionClient({
             onRegister={registerPatient}
             patients={patients}
             busy={busy}
+            todayBillingRows={todayBillingRows}
+            onOpenBilling={openBilling}
           />
         )}
 
-        {activeTab === "report" && <ReportPanel />}
+        {activeTab === "report" && (
+          <ReportPanel
+            rows={reportRows}
+            busy={busy || isLoadingReport || billingBusy}
+            onRefresh={refreshReport}
+            onOpenBilling={openBilling}
+          />
+        )}
 
         {activeTab === "settings" && (
           <SettingsPanel
@@ -261,6 +417,16 @@ export function ReceptionClient({
           />
         )}
       </main>
+
+      {billingOpen ? (
+        <BillingPopup
+          open={billingOpen}
+          busy={billingBusy}
+          data={billingData}
+          onClose={closeBilling}
+          onSubmit={submitPayment}
+        />
+      ) : null}
     </div>
   );
 }

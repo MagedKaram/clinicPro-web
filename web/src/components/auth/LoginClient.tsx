@@ -63,6 +63,20 @@ export function LoginClient() {
         .maybeSingle();
 
       if (membershipError) {
+        // In some deployments (Phase 2 single-clinic), the multi-clinic tables
+        // might not exist yet. Supabase then returns a "schema cache" error.
+        // Treat it as "no clinic yet" and route to signup.
+        const msg = (membershipError.message ?? "").toLowerCase();
+        const isMissingTable =
+          msg.includes("could not find the table") ||
+          msg.includes("schema cache") ||
+          (msg.includes("relation") && msg.includes("does not exist"));
+
+        if (isMissingTable) {
+          router.push(`/${locale}/signup`);
+          return;
+        }
+
         setError(membershipError.message);
         return;
       }

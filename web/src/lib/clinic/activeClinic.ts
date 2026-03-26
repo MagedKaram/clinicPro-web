@@ -29,6 +29,16 @@ export async function requireActiveClinicId(options: {
     .maybeSingle();
 
   if (error) {
+    const msg = (error.message ?? "").toLowerCase();
+    const isMissingTable =
+      msg.includes("could not find the table") ||
+      msg.includes("schema cache") ||
+      (msg.includes("relation") && msg.includes("does not exist"));
+
+    if (isMissingTable) {
+      redirect(`/${options.locale}/signup`);
+    }
+
     redirect(`/${options.locale}/login`);
   }
 
@@ -57,6 +67,18 @@ export async function requireActiveClinicIdForAction(): Promise<string> {
     .maybeSingle();
 
   if (error) {
+    const msg = (error.message ?? "").toLowerCase();
+    const isMissingTable =
+      msg.includes("could not find the table") ||
+      msg.includes("schema cache") ||
+      (msg.includes("relation") && msg.includes("does not exist"));
+
+    if (isMissingTable) {
+      throw new Error(
+        "Multi-clinic schema is not deployed (missing clinic_members table)",
+      );
+    }
+
     throw new Error(error.message ?? "Failed to resolve clinic");
   }
 

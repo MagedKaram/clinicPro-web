@@ -366,34 +366,48 @@
       }
     },
     "pricing": {
-      "title": "Simple Pricing",
-      "subtitle": "No hidden fees, cancel anytime.",
+      "title": "Simple & Transparent Pricing",
+      "subtitle": "No hidden fees, cancel anytime. Pay only for what you need.",
       "plans": {
         "basic": {
-          "name": "Basic",
+          "name": "Starter",
           "price": "Free",
           "period": "forever",
           "desc": "Perfect for trying out the system.",
           "features": [
             "Up to 50 patients/day",
             "1 Clinic",
-            "Basic Queue Management"
+            "Basic Queue Management",
+            "Email Support"
           ]
         },
         "pro": {
-          "name": "Pro",
+          "name": "Professional",
           "price": "99",
           "period": "EGP / month",
           "desc": "For busy clinics needing full features.",
           "features": [
             "Unlimited patients",
-            "Unlimited clinics",
+            "Up to 5 clinics",
             "Advanced Reporting",
-            "Priority Support"
+            "Priority Email Support"
+          ]
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "price": "Custom",
+          "period": "contact us",
+          "desc": "For large networks with dedicated support.",
+          "features": [
+            "Unlimited everything",
+            "Unlimited clinics",
+            "Custom integrations",
+            "24/7 Phone & Email Support",
+            "Dedicated Account Manager"
           ]
         }
       },
-      "cta": "Choose Plan"
+      "cta": "Get Started"
     },
     "footer": {
       "rights": "© 2024 Clinic Queue. All rights reserved.",

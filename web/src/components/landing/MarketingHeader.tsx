@@ -10,7 +10,7 @@ export function MarketingHeader() {
   const locale = useLocale();
 
   return (
-    <motion.header 
+    <motion.header
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
@@ -22,9 +22,13 @@ export function MarketingHeader() {
           className="flex items-center gap-2 text-xl font-black tracking-tighter text-rec-primary hover:scale-105 transition-transform"
         >
           <span>Clinic Queue</span>
-          <motion.div 
-            animate={{ 
-              boxShadow: ["0 0 0px var(--rec-accent)", "0 0 15px var(--rec-accent)", "0 0 0px var(--rec-accent)"] 
+          <motion.div
+            animate={{
+              boxShadow: [
+                "0 0 0px var(--rec-accent)",
+                "0 0 15px var(--rec-accent)",
+                "0 0 0px var(--rec-accent)",
+              ],
             }}
             transition={{ duration: 2, repeat: Infinity }}
             className="hidden sm:flex items-center justify-center rounded-full bg-rec-accent/10 px-2.5 py-0.5 text-[0.65rem] font-bold text-rec-accent ring-1 ring-inset ring-rec-accent/20 uppercase"
@@ -62,7 +66,10 @@ export function MarketingHeader() {
         </Link>
         <Link href={`/${locale}/signup`}>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <PrimaryButton className="px-5 py-2 text-sm rounded-full shadow-lg shadow-rec-primary/30" type="button">
+            <PrimaryButton
+              className="px-5 py-2 text-sm rounded-full shadow-lg shadow-rec-primary/30 m-0"
+              type="button"
+            >
               {t("signup")}
             </PrimaryButton>
           </motion.div>

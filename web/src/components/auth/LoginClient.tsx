@@ -9,6 +9,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { Card } from "@/components/reception/Card";
 import {
   InputLabel,
+  PasswordInput,
   PrimaryButton,
   TextInput,
 } from "@/components/auth/AuthInputs";
@@ -102,10 +103,9 @@ export function LoginClient() {
             />
           </div>
 
-          <div className="mb-2">
+          <div className="mb-1">
             <InputLabel>{t("fields.password")}</InputLabel>
-            <TextInput
-              type="password"
+            <PasswordInput
               autoComplete="current-password"
               placeholder={t("placeholders.password")}
               value={password}
@@ -113,6 +113,16 @@ export function LoginClient() {
               disabled={busy}
               dir="ltr"
             />
+          </div>
+
+          {/* Forgot password link */}
+          <div className="mb-3 text-right">
+            <Link
+              href={`/${locale}/forgot-password`}
+              className="text-[0.82rem] text-rec-muted hover:text-rec-primary transition-colors"
+            >
+              {t("cta.forgotPassword")}
+            </Link>
           </div>
 
           {error ? (

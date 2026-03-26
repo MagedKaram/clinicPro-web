@@ -9,6 +9,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { Card } from "@/components/reception/Card";
 import {
   InputLabel,
+  PasswordInput,
   PrimaryButton,
   TextInput,
 } from "@/components/auth/AuthInputs";
@@ -101,7 +102,9 @@ export function SignupClient() {
           return;
         }
 
-        // If email confirmations are enabled, session can be null.
+        // If email confirmations are enabled, session will be null.
+        // Tell the user to check their email; they'll come back to login
+        // which will redirect them here to create the clinic after confirmation.
         if (!data.session) {
           setInfo(t("info.checkEmail"));
           return;
@@ -143,8 +146,7 @@ export function SignupClient() {
 
               <div className="mb-4">
                 <InputLabel>{t("fields.password")}</InputLabel>
-                <TextInput
-                  type="password"
+                <PasswordInput
                   autoComplete="new-password"
                   placeholder={t("placeholders.password")}
                   value={password}
@@ -206,8 +208,8 @@ export function SignupClient() {
           </div>
 
           {info ? (
-            <div className="mt-3 text-[0.85rem] text-success text-right">
-              {info}
+            <div className="mt-3 p-3 rounded-xl bg-success-soft text-[0.85rem] text-success text-right">
+              📧 {info}
             </div>
           ) : null}
 
@@ -217,9 +219,12 @@ export function SignupClient() {
             </div>
           ) : null}
 
-          <PrimaryButton type="submit" disabled={!canSubmit}>
-            {busy ? t("cta.loading") : t("cta.create")}
-          </PrimaryButton>
+          {/* Hide submit button after email confirmation message shown */}
+          {!info && (
+            <PrimaryButton type="submit" disabled={!canSubmit}>
+              {busy ? t("cta.loading") : t("cta.create")}
+            </PrimaryButton>
+          )}
         </form>
 
         <div className="mt-4 text-[0.85rem] text-rec-muted">

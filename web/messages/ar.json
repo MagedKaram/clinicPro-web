@@ -270,7 +270,8 @@
     "cta": {
       "login": "دخول",
       "loading": "لحظة…",
-      "createAccount": "إنشاء حساب"
+      "createAccount": "إنشاء حساب",
+      "forgotPassword": "نسيت كلمة المرور؟"
     },
     "signupPrompt": "معندكش حساب؟",
     "errors": {
@@ -309,6 +310,42 @@
     "errors": {
       "notAuthenticated": "غير مسجل دخول",
       "unknown": "حصلت مشكلة. جرّب تاني."
+    }
+  },
+  "forgotPassword": {
+    "title": "نسيت كلمة المرور",
+    "subtitle": "هنبعتلك إيميل برابط إعادة التعيين",
+    "fields": {
+      "email": "الإيميل"
+    },
+    "placeholders": {
+      "email": "name@clinic.com"
+    },
+    "cta": {
+      "send": "إرسال رابط الاسترداد",
+      "loading": "لحظة…",
+      "backToLogin": "رجوع لتسجيل الدخول"
+    },
+    "success": "تم إرسال رابط إعادة التعيين. راجع الإيميل بتاعك."
+  },
+  "resetPassword": {
+    "title": "تعيين كلمة مرور جديدة",
+    "subtitle": "اكتب كلمة المرور الجديدة",
+    "loading": "جاري تحميل الجلسة…",
+    "fields": {
+      "password": "كلمة المرور الجديدة",
+      "confirm": "تأكيد كلمة المرور"
+    },
+    "placeholders": {
+      "password": "اكتب كلمة مرور جديدة",
+      "confirm": "أعد كتابة كلمة المرور"
+    },
+    "cta": {
+      "save": "حفظ كلمة المرور",
+      "loading": "لحظة…"
+    },
+    "errors": {
+      "mismatch": "كلمتا المرور غير متطابقتين"
     }
   },
   "landing": {

@@ -74,6 +74,7 @@ export function DoctorClient({
     day: new Date().toISOString().slice(0, 10),
     enabled: activeTab === "exam",
     onChange: refreshQueue,
+    fallbackPollMs: 5000,
   });
   const patientNameById = useMemo(() => {
     const map = new Map<string, string>();

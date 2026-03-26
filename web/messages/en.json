@@ -258,6 +258,147 @@
   },
   "login": {
     "title": "Login",
-    "comingSoon": "Coming soon"
+    "subtitle": "Sign in to continue",
+    "fields": {
+      "email": "Email",
+      "password": "Password"
+    },
+    "placeholders": {
+      "email": "name@clinic.com",
+      "password": "••••••••"
+    },
+    "cta": {
+      "login": "Login",
+      "loading": "Please wait…",
+      "createAccount": "Create an account"
+    },
+    "signupPrompt": "No account?",
+    "errors": {
+      "unknown": "Something went wrong. Please try again."
+    }
+  },
+  "signup": {
+    "title": "Create account",
+    "subtitle": "Create your clinic workspace",
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "clinicName": "Clinic name",
+      "doctorName": "Doctor name",
+      "address": "Address (optional)",
+      "phone": "Phone (optional)"
+    },
+    "placeholders": {
+      "email": "name@clinic.com",
+      "password": "Create a password",
+      "clinicName": "e.g. Al Noor Clinic",
+      "doctorName": "e.g. Dr. Ahmed",
+      "address": "",
+      "phone": ""
+    },
+    "cta": {
+      "create": "Create",
+      "loading": "Please wait…",
+      "backToLogin": "Back to login"
+    },
+    "loginPrompt": "Already have an account?",
+    "info": {
+      "alreadySignedIn": "You're already signed in. Create your clinic now.",
+      "checkEmail": "Check your email to confirm your account, then come back to login."
+    },
+    "errors": {
+      "notAuthenticated": "Not authenticated",
+      "unknown": "Something went wrong. Please try again."
+    }
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How it works",
+      "pricing": "Pricing",
+      "login": "Login",
+      "signup": "Sign Up"
+    },
+    "hero": {
+      "title": "Smart Clinic Management",
+      "subtitle": "Streamline your clinic with our smart queue and management system. Say goodbye to messy waiting rooms and hello to seamless operations.",
+      "ctaPrimary": "Get Started Now",
+      "ctaSecondary": "View Features"
+    },
+    "features": {
+      "title": "Why Choose Clinic Queue?",
+      "subtitle": "Everything you need to run your clinic smoothly",
+      "items": {
+        "queue": {
+          "title": "Smart Queue Management",
+          "desc": "Efficiently manage patient queues with real-time displays and ticketing."
+        },
+        "multiClinic": {
+          "title": "Multi-Clinic Support",
+          "desc": "Manage multiple clinics and doctors seamlessly under one account."
+        },
+        "doctor": {
+          "title": "Doctor Dashboard",
+          "desc": "Dedicated view for doctors to see patient history, add notes, and call the next patient."
+        },
+        "billing": {
+          "title": "Integrated Billing",
+          "desc": "Keep track of visit fees, payments, and patient balances with ease."
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Get up and running in minutes",
+      "steps": {
+        "1": {
+          "title": "Create Account",
+          "desc": "Sign up and create your clinic workspace."
+        },
+        "2": {
+          "title": "Add Details",
+          "desc": "Configure your clinic name, doctor, and pricing."
+        },
+        "3": {
+          "title": "Start Serving",
+          "desc": "Register patients and manage your queue immediately."
+        }
+      }
+    },
+    "pricing": {
+      "title": "Simple Pricing",
+      "subtitle": "No hidden fees, cancel anytime.",
+      "plans": {
+        "basic": {
+          "name": "Basic",
+          "price": "Free",
+          "period": "forever",
+          "desc": "Perfect for trying out the system.",
+          "features": [
+            "Up to 50 patients/day",
+            "1 Clinic",
+            "Basic Queue Management"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "99",
+          "period": "EGP / month",
+          "desc": "For busy clinics needing full features.",
+          "features": [
+            "Unlimited patients",
+            "Unlimited clinics",
+            "Advanced Reporting",
+            "Priority Support"
+          ]
+        }
+      },
+      "cta": "Choose Plan"
+    },
+    "footer": {
+      "rights": "© 2024 Clinic Queue. All rights reserved.",
+      "company": "Clinic Queue",
+      "tagline": "Modernizing healthcare management."
+    }
   }
 }

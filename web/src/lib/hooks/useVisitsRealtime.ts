@@ -6,6 +6,7 @@ import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export type UseVisitsRealtimeOptions = {
+  clinicId?: string;
   day: string;
   enabled?: boolean;
   onChange: () => void;
@@ -26,6 +27,7 @@ function getVisitDateFromRow(row: unknown): string {
 }
 
 export function useVisitsRealtime({
+  clinicId,
   day,
   enabled = true,
   onChange,
@@ -75,15 +77,33 @@ export function useVisitsRealtime({
 
     document.addEventListener("visibilitychange", onVisibilityChange);
 
+    const channelName = clinicId
+      ? `visits-${clinicId}-${effectiveDay}`
+      : `visits-${effectiveDay}`;
+
+    const changesConfig: {
+      event: "*";
+      schema: "public";
+      table: "visits";
+      filter?: string;
+    } = {
+      event: "*",
+      schema: "public",
+      table: "visits",
+    };
+
+    // IMPORTANT:
+    // With multi-clinic, we MUST filter to avoid receiving other clinics' row data.
+    // Filtering by clinic_id is safe because clinic_id is immutable for a row.
+    if (clinicId) {
+      changesConfig.filter = `clinic_id=eq.${clinicId}`;
+    }
+
     const channel = supabase
-      .channel(`visits-${effectiveDay}`)
+      .channel(channelName)
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "visits",
-        },
+        changesConfig,
         (
           payload: RealtimePostgresChangesPayload<{
             visit_date?: string | null;
@@ -142,5 +162,5 @@ export function useVisitsRealtime({
       document.removeEventListener("visibilitychange", onVisibilityChange);
       supabase.removeChannel(channel);
     };
-  }, [day, enabled, fallbackPollMs]);
+  }, [clinicId, day, enabled, fallbackPollMs]);
 }

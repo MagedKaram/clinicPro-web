@@ -13,6 +13,7 @@ import type {
   VisitType,
 } from "@/types/clinic";
 
+import { requireActiveClinicIdForAction } from "@/lib/clinic/activeClinic";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function todayISODate(): string {
@@ -27,7 +28,10 @@ function nowTimeHHMMSS(): string {
   return `${hh}:${mm}:${ss}`;
 }
 
-async function getQueueState(day: string): Promise<QueueState> {
+async function getQueueState(
+  clinicId: string,
+  day: string,
+): Promise<QueueState> {
   const supabase = await createSupabaseServerClient();
   const sb = supabase as any;
 
@@ -49,6 +53,7 @@ async function getQueueState(day: string): Promise<QueueState> {
         "paid",
       ].join(","),
     )
+    .eq("clinic_id", clinicId)
     .eq("visit_date", day)
     .in("status", ["waiting", "serving"])
     .order("ticket", { ascending: true });
@@ -78,6 +83,7 @@ async function getQueueState(day: string): Promise<QueueState> {
     const { data: patients } = await sb
       .from("patients")
       .select("id, name")
+      .eq("clinic_id", clinicId)
       .in("id", patientIds);
 
     if (patients) {
@@ -119,7 +125,10 @@ async function getQueueState(day: string): Promise<QueueState> {
   };
 }
 
-async function getDayVisits(day: string): Promise<DailyVisitRow[]> {
+async function getDayVisits(
+  clinicId: string,
+  day: string,
+): Promise<DailyVisitRow[]> {
   const supabase = await createSupabaseServerClient();
   const sb = supabase as any;
 
@@ -137,6 +146,7 @@ async function getDayVisits(day: string): Promise<DailyVisitRow[]> {
         "paid",
       ].join(","),
     )
+    .eq("clinic_id", clinicId)
     .eq("visit_date", day)
     .order("ticket", { ascending: true });
 
@@ -158,6 +168,7 @@ async function getDayVisits(day: string): Promise<DailyVisitRow[]> {
     const { data: patients } = await sb
       .from("patients")
       .select("id, name")
+      .eq("clinic_id", clinicId)
       .in("id", patientIds);
 
     if (patients) {
@@ -180,13 +191,17 @@ async function getDayVisits(day: string): Promise<DailyVisitRow[]> {
   }));
 }
 
-async function getVisitBilling(visitId: string): Promise<VisitBilling> {
+async function getVisitBilling(
+  clinicId: string,
+  visitId: string,
+): Promise<VisitBilling> {
   const supabase = await createSupabaseServerClient();
   const sb = supabase as any;
 
   const { data: visit, error: visitError } = await sb
     .from("visits")
     .select("id, patient_id, ticket, visit_type, price, paid")
+    .eq("clinic_id", clinicId)
     .eq("id", visitId)
     .single();
 
@@ -199,6 +214,7 @@ async function getVisitBilling(visitId: string): Promise<VisitBilling> {
   const { data: patient, error: patientError } = await sb
     .from("patients")
     .select("id, name, phone, address")
+    .eq("clinic_id", clinicId)
     .eq("id", patientId)
     .single();
 
@@ -209,6 +225,7 @@ async function getVisitBilling(visitId: string): Promise<VisitBilling> {
   const { data: chargedRows } = await sb
     .from("visits")
     .select("price")
+    .eq("clinic_id", clinicId)
     .eq("patient_id", patientId)
     .eq("status", "done");
 
@@ -219,6 +236,7 @@ async function getVisitBilling(visitId: string): Promise<VisitBilling> {
   const { data: paymentRows } = await sb
     .from("payments")
     .select("amount")
+    .eq("clinic_id", clinicId)
     .eq("patient_id", patientId);
 
   const patientPaid = Array.isArray(paymentRows)
@@ -254,6 +272,7 @@ async function getVisitBilling(visitId: string): Promise<VisitBilling> {
 }
 
 async function getPatientBillingSummary(
+  clinicId: string,
   patientId: string,
 ): Promise<PatientBillingSummary> {
   const supabase = await createSupabaseServerClient();
@@ -262,12 +281,14 @@ async function getPatientBillingSummary(
   const { count: visitsCount = 0 } = await sb
     .from("visits")
     .select("id", { count: "exact", head: true })
+    .eq("clinic_id", clinicId)
     .eq("patient_id", patientId)
     .eq("status", "done");
 
   const { data: chargedRows } = await sb
     .from("visits")
     .select("price")
+    .eq("clinic_id", clinicId)
     .eq("patient_id", patientId)
     .eq("status", "done");
 
@@ -278,6 +299,7 @@ async function getPatientBillingSummary(
   const { data: paymentRows } = await sb
     .from("payments")
     .select("amount")
+    .eq("clinic_id", clinicId)
     .eq("patient_id", patientId);
 
   const paid = Array.isArray(paymentRows)
@@ -294,6 +316,7 @@ async function getPatientBillingSummary(
 }
 
 async function getPatientFile(
+  clinicId: string,
   patientId: string,
   currentVisitId: string | undefined,
 ): Promise<PatientFile> {
@@ -303,6 +326,7 @@ async function getPatientFile(
   const { data: patient, error: patientError } = await sb
     .from("patients")
     .select("id, name, phone, address")
+    .eq("clinic_id", clinicId)
     .eq("id", patientId)
     .maybeSingle();
 
@@ -335,6 +359,7 @@ async function getPatientFile(
         "paid",
       ].join(","),
     )
+    .eq("clinic_id", clinicId)
     .eq("patient_id", patientId)
     .eq("status", "done")
     .order("visit_date", { ascending: false })
@@ -376,13 +401,17 @@ async function getPatientFile(
   };
 }
 
-async function getDailyBalance(day: string): Promise<DailyBalance> {
+async function getDailyBalance(
+  clinicId: string,
+  day: string,
+): Promise<DailyBalance> {
   const supabase = await createSupabaseServerClient();
   const sb = supabase as any;
 
   const { data, error } = await sb
     .from("visits")
     .select("price, paid")
+    .eq("clinic_id", clinicId)
     .eq("visit_date", day);
 
   if (error || !data) return { total: 0, paid: 0, remaining: 0 };
@@ -401,10 +430,14 @@ async function getDailyBalance(day: string): Promise<DailyBalance> {
 export async function callNextAction(day: string = todayISODate()): Promise<{
   ok: true;
 }> {
+  const clinicId = await requireActiveClinicIdForAction();
   const supabase = await createSupabaseServerClient();
   const sb = supabase as any;
 
-  const { error } = await sb.rpc("call_next", { p_day: day });
+  const { error } = await sb.rpc("call_next", {
+    p_clinic_id: clinicId,
+    p_day: day,
+  });
   if (error) throw new Error(error.message ?? "Failed to call next");
 
   return { ok: true };
@@ -416,7 +449,8 @@ export async function getPatientBillingSummaryAction(
   if (!patientId) {
     return { patientId: "", visitsCount: 0, charged: 0, paid: 0, remaining: 0 };
   }
-  return getPatientBillingSummary(patientId);
+  const clinicId = await requireActiveClinicIdForAction();
+  return getPatientBillingSummary(clinicId, patientId);
 }
 
 export async function finishVisitAction(input: {
@@ -427,6 +461,7 @@ export async function finishVisitAction(input: {
   price: number;
   day?: string;
 }): Promise<{ ok: true }> {
+  const clinicId = await requireActiveClinicIdForAction();
   const supabase = await createSupabaseServerClient();
   const sb = supabase as any;
 
@@ -439,6 +474,7 @@ export async function finishVisitAction(input: {
       notes: input.notes ?? "",
       price: Number(input.price ?? 0),
     })
+    .eq("clinic_id", clinicId)
     .eq("id", input.visitId);
 
   if (error) throw new Error(error.message ?? "Failed to finish visit");
@@ -459,6 +495,7 @@ export async function registerVisitAction(input: {
   waitingAhead: number;
   patient: { id: string; name: string; phone?: string; address?: string };
 }> {
+  const clinicId = await requireActiveClinicIdForAction();
   const day = input.day ?? todayISODate();
   const visitTime = nowTimeHHMMSS();
 
@@ -473,6 +510,7 @@ export async function registerVisitAction(input: {
   const { count: waitingAhead = 0 } = await sb
     .from("visits")
     .select("id", { count: "exact", head: true })
+    .eq("clinic_id", clinicId)
     .eq("visit_date", day)
     .eq("status", "waiting");
 
@@ -483,6 +521,7 @@ export async function registerVisitAction(input: {
     const { data } = await sb
       .from("patients")
       .select("id, name, phone, address")
+      .eq("clinic_id", clinicId)
       .eq("id", patientId)
       .single();
     patientRow = data ?? null;
@@ -493,6 +532,7 @@ export async function registerVisitAction(input: {
       const { data: existing } = await sb
         .from("patients")
         .select("id, name, phone, address")
+        .eq("clinic_id", clinicId)
         .eq("phone", cleanPhone)
         .maybeSingle();
       if (existing) {
@@ -505,7 +545,12 @@ export async function registerVisitAction(input: {
   if (!patientId) {
     const { data: inserted, error: insertError } = await sb
       .from("patients")
-      .insert({ name: cleanName, phone: cleanPhone, address: cleanAddress })
+      .insert({
+        clinic_id: clinicId,
+        name: cleanName,
+        phone: cleanPhone,
+        address: cleanAddress,
+      })
       .select("id, name, phone, address")
       .single();
 
@@ -518,7 +563,10 @@ export async function registerVisitAction(input: {
   }
 
   const allocateTicket = async (): Promise<number> => {
-    const { data, error } = await sb.rpc("allocate_ticket", { p_day: day });
+    const { data, error } = await sb.rpc("allocate_ticket", {
+      p_clinic_id: clinicId,
+      p_day: day,
+    });
     if (error || typeof data !== "number") {
       throw new Error(error?.message ?? "Failed to allocate ticket");
     }
@@ -533,6 +581,7 @@ export async function registerVisitAction(input: {
   // unique (visit_date, ticket) constraint, allocate a new ticket and retry.
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const { error: visitInsertError } = await sb.from("visits").insert({
+      clinic_id: clinicId,
       patient_id: patientId,
       ticket: ticketData,
       visit_type: input.visitType,
@@ -572,6 +621,7 @@ export async function registerVisitAction(input: {
 }
 
 export async function saveSettingsAction(input: Settings): Promise<Settings> {
+  const clinicId = await requireActiveClinicIdForAction();
   const supabase = await createSupabaseServerClient();
   const sb = supabase as any;
 
@@ -588,7 +638,7 @@ export async function saveSettingsAction(input: Settings): Promise<Settings> {
   const { data, error } = await sb
     .from("settings")
     .update(payload)
-    .eq("id", 1)
+    .eq("clinic_id", clinicId)
     .select(
       "clinic_name, doctor_name, address, phone, price_new, price_followup",
     )
@@ -611,12 +661,14 @@ export async function saveSettingsAction(input: Settings): Promise<Settings> {
 export async function endDayAction(day: string = todayISODate()): Promise<{
   ok: true;
 }> {
+  const clinicId = await requireActiveClinicIdForAction();
   const supabase = await createSupabaseServerClient();
   const sb = supabase as any;
 
   const { error: closeError } = await sb
     .from("visits")
     .update({ status: "done" })
+    .eq("clinic_id", clinicId)
     .eq("visit_date", day)
     .in("status", ["waiting", "serving"]);
 
@@ -632,19 +684,22 @@ export async function endDayAction(day: string = todayISODate()): Promise<{
 export async function refreshDailyBalanceAction(
   day: string = todayISODate(),
 ): Promise<DailyBalance> {
-  return getDailyBalance(day);
+  const clinicId = await requireActiveClinicIdForAction();
+  return getDailyBalance(clinicId, day);
 }
 
 export async function getDayVisitsAction(
   day: string = todayISODate(),
 ): Promise<DailyVisitRow[]> {
-  return getDayVisits(day);
+  const clinicId = await requireActiveClinicIdForAction();
+  return getDayVisits(clinicId, day);
 }
 
 export async function getVisitBillingAction(
   visitId: string,
 ): Promise<VisitBilling> {
-  return getVisitBilling(visitId);
+  const clinicId = await requireActiveClinicIdForAction();
+  return getVisitBilling(clinicId, visitId);
 }
 
 export async function getPatientFileAction(
@@ -652,7 +707,8 @@ export async function getPatientFileAction(
   currentVisitId?: string,
 ): Promise<PatientFile> {
   if (!patientId) throw new Error("Missing patientId");
-  return getPatientFile(patientId, currentVisitId);
+  const clinicId = await requireActiveClinicIdForAction();
+  return getPatientFile(clinicId, patientId, currentVisitId);
 }
 
 export async function addPaymentAction(input: {
@@ -661,6 +717,7 @@ export async function addPaymentAction(input: {
   amount: number;
   note?: string;
 }): Promise<VisitBilling> {
+  const clinicId = await requireActiveClinicIdForAction();
   const amount = Number(input.amount ?? 0);
   if (!input.patientId) throw new Error("Missing patientId");
   if (!input.visitId) throw new Error("Missing visitId");
@@ -680,6 +737,7 @@ export async function addPaymentAction(input: {
   const { data: chargedRows } = await sb
     .from("visits")
     .select("price")
+    .eq("clinic_id", clinicId)
     .eq("patient_id", input.patientId)
     .eq("status", "done");
 
@@ -690,6 +748,7 @@ export async function addPaymentAction(input: {
   const { data: paymentRows } = await sb
     .from("payments")
     .select("amount")
+    .eq("clinic_id", clinicId)
     .eq("patient_id", input.patientId);
 
   const patientPaid = Array.isArray(paymentRows)
@@ -707,6 +766,7 @@ export async function addPaymentAction(input: {
   const { data: currentVisit, error: currentVisitError } = await sb
     .from("visits")
     .select("id, price, paid")
+    .eq("clinic_id", clinicId)
     .eq("id", input.visitId)
     .single();
 
@@ -719,6 +779,7 @@ export async function addPaymentAction(input: {
   const { data: unpaidVisits, error: unpaidError } = await sb
     .from("visits")
     .select("id, price, paid, visit_date, ticket")
+    .eq("clinic_id", clinicId)
     .eq("patient_id", input.patientId)
     .eq("status", "done")
     .order("visit_date", { ascending: true })
@@ -761,6 +822,7 @@ export async function addPaymentAction(input: {
     if (chunk <= 0) continue;
 
     const { error: insertError } = await sb.from("payments").insert({
+      clinic_id: clinicId,
       patient_id: input.patientId,
       visit_id: v.id,
       amount: chunk,
@@ -774,6 +836,7 @@ export async function addPaymentAction(input: {
     const { error: updateError } = await sb
       .from("visits")
       .update({ paid: Number(v.paid ?? 0) + chunk })
+      .eq("clinic_id", clinicId)
       .eq("id", v.id);
 
     if (updateError) {
@@ -783,11 +846,12 @@ export async function addPaymentAction(input: {
     remainingToApply -= chunk;
   }
 
-  return getVisitBilling(input.visitId);
+  return getVisitBilling(clinicId, input.visitId);
 }
 
 export async function getQueueStateAction(
   day: string = todayISODate(),
 ): Promise<QueueState> {
-  return getQueueState(day);
+  const clinicId = await requireActiveClinicIdForAction();
+  return getQueueState(clinicId, day);
 }

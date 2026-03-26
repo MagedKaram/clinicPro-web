@@ -14,6 +14,7 @@ import { getQueueStateAction } from "@/lib/actions/clinic";
 import { useVisitsRealtime } from "@/lib/hooks/useVisitsRealtime";
 
 type DisplayClientProps = {
+  clinicId: string;
   settings: Settings;
   queue: QueueState;
 };
@@ -39,7 +40,11 @@ function formatTimeAndDate(now: Date | null, locale: string) {
   return { time, date };
 }
 
-export function DisplayClient({ settings, queue }: DisplayClientProps) {
+export function DisplayClient({
+  clinicId,
+  settings,
+  queue,
+}: DisplayClientProps) {
   const locale = useLocale();
   const t = useTranslations("display");
 
@@ -55,6 +60,7 @@ export function DisplayClient({ settings, queue }: DisplayClientProps) {
   }, []);
 
   useVisitsRealtime({
+    clinicId,
     day: new Date().toISOString().slice(0, 10),
     onChange: refreshQueue,
   });

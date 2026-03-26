@@ -33,9 +33,15 @@ function todayISODate(): string {
 
 export async function getSettingsServer(
   locale: string | undefined,
+  clinicId?: string,
 ): Promise<Settings> {
   if (!isSupabaseConfigured()) {
     warnSupabaseFallback("settings", "Supabase env not configured");
+    return getMockSettings(locale);
+  }
+
+  if (!clinicId) {
+    warnSupabaseFallback("settings", "Missing clinicId (unauthenticated?)");
     return getMockSettings(locale);
   }
 
@@ -47,7 +53,7 @@ export async function getSettingsServer(
       .select(
         "clinic_name, doctor_name, address, phone, price_new, price_followup",
       )
-      .eq("id", 1)
+      .eq("clinic_id", clinicId)
       .single();
 
     if (error || !data) {
@@ -72,9 +78,14 @@ export async function getSettingsServer(
   }
 }
 
-export async function getPatientsServer(): Promise<Patient[]> {
+export async function getPatientsServer(clinicId?: string): Promise<Patient[]> {
   if (!isSupabaseConfigured()) {
     warnSupabaseFallback("patients", "Supabase env not configured");
+    return mockPatients;
+  }
+
+  if (!clinicId) {
+    warnSupabaseFallback("patients", "Missing clinicId (unauthenticated?)");
     return mockPatients;
   }
 
@@ -84,6 +95,7 @@ export async function getPatientsServer(): Promise<Patient[]> {
     const { data, error } = await supabaseAny
       .from("patients")
       .select("id, name, phone, address, created_at")
+      .eq("clinic_id", clinicId)
       .order("created_at", { ascending: false })
       .limit(200);
 
@@ -110,9 +122,15 @@ export async function getPatientsServer(): Promise<Patient[]> {
 
 export async function getQueueStateServer(
   day: string = todayISODate(),
+  clinicId?: string,
 ): Promise<QueueState> {
   if (!isSupabaseConfigured()) {
     warnSupabaseFallback("queue", "Supabase env not configured");
+    return mockQueueState;
+  }
+
+  if (!clinicId) {
+    warnSupabaseFallback("queue", "Missing clinicId (unauthenticated?)");
     return mockQueueState;
   }
 
@@ -138,6 +156,7 @@ export async function getQueueStateServer(
           "paid",
         ].join(","),
       )
+      .eq("clinic_id", clinicId)
       .eq("visit_date", day)
       .in("status", ["waiting", "serving"])
       .order("ticket", { ascending: true });
@@ -163,6 +182,7 @@ export async function getQueueStateServer(
       const { data: patients, error: patientsError } = await supabaseAny
         .from("patients")
         .select("id, name")
+        .eq("clinic_id", clinicId)
         .in("id", patientIds);
 
       if (!patientsError && patients) {
@@ -210,9 +230,18 @@ export async function getQueueStateServer(
 
 export async function getDailyBalanceServer(
   day: string = todayISODate(),
+  clinicId?: string,
 ): Promise<DailyBalance> {
   if (!isSupabaseConfigured()) {
     warnSupabaseFallback("daily-balance", "Supabase env not configured");
+    return mockDailyBalance;
+  }
+
+  if (!clinicId) {
+    warnSupabaseFallback(
+      "daily-balance",
+      "Missing clinicId (unauthenticated?)",
+    );
     return mockDailyBalance;
   }
 
@@ -222,6 +251,7 @@ export async function getDailyBalanceServer(
     const { data, error } = await supabaseAny
       .from("visits")
       .select("price, paid")
+      .eq("clinic_id", clinicId)
       .eq("visit_date", day);
 
     if (error || !data) {

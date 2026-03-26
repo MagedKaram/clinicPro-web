@@ -31,6 +31,7 @@ import {
 } from "@/lib/actions/clinic";
 
 import { useVisitsRealtime } from "@/lib/hooks/useVisitsRealtime";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { ReceptionHeader } from "@/components/reception/ReceptionHeader";
 import {
   ReceptionTabs,
@@ -43,6 +44,7 @@ import { SettingsPanel } from "@/components/reception/SettingsPanel";
 import { BillingPopup } from "@/components/reception/BillingPopup";
 
 export type ReceptionClientProps = {
+  clinicId: string;
   initialSettings: Settings;
   initialQueueState: QueueState;
   initialDailyBalance: DailyBalance;
@@ -50,6 +52,7 @@ export type ReceptionClientProps = {
 };
 
 export function ReceptionClient({
+  clinicId,
   initialSettings,
   initialQueueState,
   initialDailyBalance,
@@ -109,6 +112,7 @@ export function ReceptionClient({
   }, []);
 
   useVisitsRealtime({
+    clinicId,
     day: new Date().toISOString().slice(0, 10),
     // Safety net: keep reception in sync even if realtime emits no events.
     fallbackPollMs: 12000,
@@ -167,8 +171,13 @@ export function ReceptionClient({
   }
 
   function logout() {
-    // UI phase: just route to login screen placeholder.
-    window.location.href = `/${locale}/login`;
+    void (async () => {
+      try {
+        await createSupabaseBrowserClient().auth.signOut();
+      } finally {
+        window.location.href = `/${locale}/login`;
+      }
+    })();
   }
 
   function updateBalance() {

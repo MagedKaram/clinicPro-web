@@ -1,7 +1,10 @@
-import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 
-export default async function LocaleIndexPage({
+import { SignupClient } from "@/components/auth/SignupClient";
+
+export const dynamic = "force-dynamic";
+
+export default async function SignupPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
@@ -9,5 +12,5 @@ export default async function LocaleIndexPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  redirect(`/${locale}/landing`);
+  return <SignupClient />;
 }

@@ -21,6 +21,7 @@ import {
 } from "@/lib/actions/clinic";
 
 import { useVisitsRealtime } from "@/lib/hooks/useVisitsRealtime";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 import { DoctorHeader } from "@/components/doctor/DoctorHeader";
 import { DoctorTabs, type DoctorTab } from "@/components/doctor/DoctorTabs";
@@ -35,6 +36,7 @@ import type { PatientFile } from "@/types/clinic";
 import { MedicalHistoryPopup } from "@/components/doctor/MedicalHistoryPopup";
 
 export type DoctorClientProps = {
+  clinicId: string;
   initialSettings: Settings;
   initialQueueState: QueueState;
   patients: Patient[];
@@ -45,6 +47,7 @@ function defaultPrice(settings: Settings, visitType: VisitType) {
 }
 
 export function DoctorClient({
+  clinicId,
   initialSettings,
   initialQueueState,
   patients,
@@ -67,6 +70,7 @@ export function DoctorClient({
   }, []);
 
   useVisitsRealtime({
+    clinicId,
     day: new Date().toISOString().slice(0, 10),
     enabled: activeTab === "exam",
     onChange: refreshQueue,
@@ -228,7 +232,13 @@ export function DoctorClient({
   }
 
   function logout() {
-    window.location.href = `/${locale}/login`;
+    void (async () => {
+      try {
+        await createSupabaseBrowserClient().auth.signOut();
+      } finally {
+        window.location.href = `/${locale}/login`;
+      }
+    })();
   }
 
   function callNext() {

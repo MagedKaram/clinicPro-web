@@ -17,3 +17,7 @@ cd web
 pnpm build
 pnpm start
 ```
+
+## Gemini
+
+راجع `GEMINI.md` في الجذر لو عايز brief جاهز لجمناي لبناء الويبسايت التعريفي.

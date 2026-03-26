@@ -41,6 +41,8 @@ Helpers:
 - tables: `patients`, `visits`, `settings`, `payments`, `daily_counters` (+ `profiles` للـ roles لاحقًا)
 - RPCs: `allocate_ticket(date)` + `call_next(date)`
 
+> ملاحظة: Payments موجودة في schema كجدول `payments` وتم استخدامها في الـ Payments MVP.
+
 ---
 
 ## Data Layer (قراءة) — تم
@@ -77,6 +79,7 @@ Hook موحد للـ subscription على `public.visits`:
 ملاحظات مهمة:
 
 - الـ hook realtime-only افتراضيًا (مفيش polling إلا لو مررت `fallbackPollMs`).
+- يفضّل تفعيل fallback polling في الإنتاج كـ safety net لو realtime اتقطع (قيمة صغيرة مثل 5-10 ثواني).
 - الاشتراك بدون server-side filter لتفادي فقد UPDATE events في بعض إعدادات replica identity.
 - لو التاب hidden بنؤجل refresh لأول ما يرجع visible.
 
@@ -109,3 +112,16 @@ alter publication supabase_realtime add table public.visits;
 - افتح `/reception` و`/doctor` و`/display`.
 - اعمل register من الاستقبال.
 - تأكد إن الدكتور/الشاشة بيتحدثوا لحظيًا بدون refresh.
+
+### Billing / Payments (سريع)
+
+- أنهِ كشف من صفحة الدكتور (status -> done).
+- تأكد إن الاستقبال يظهر له Billing popup تلقائيًا (أو ضمن "حسابات اليوم").
+- سجل دفعة وتأكد أن المتبقي يتحدث وأن `visits.paid` يتم تحديثه.
+
+### Production sanity (قبل نشر Vercel)
+
+- تأكد أن env vars موجودة على Vercel (Production):
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- افتح `/ar/login` و`/en/login` بعد النشر.

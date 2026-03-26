@@ -1,8 +1,10 @@
 # 🏥 Clinic Queue System — SaaS PRD
 
 > **Product Requirements Document**
-> Stack: Next.js 15 · TypeScript · Tailwind CSS · Supabase · Socket.IO
-> Status: Phase 1 — UI Conversion (Mock Data Only)
+> Stack: Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · next-intl · Supabase (DB + Realtime)
+> Status: Phase 2 (Supabase + Realtime + Payments MVP) — Auth/Roles + RLS pending
+
+> Note: بعض أجزاء هذا الـ PRD تاريخية/خطة قديمة. المصدر الأدق للوضع الحالي: `PROGRESS.md` وملفات `docs/` وملف `GEMINI.md`.
 
 ---
 

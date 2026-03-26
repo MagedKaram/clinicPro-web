@@ -25,6 +25,12 @@
 - [x] `/[locale]/login` — Placeholder UI + i18n
 - [ ] `/[locale]/login` — role-based login UI (mock auth) + حماية صفحات حسب الدور
 
+## Phase 1.7 — Marketing Landing (ويبسايت تعريفي)
+
+- [ ] إضافة `/[locale]/landing` (MVP sections: Hero/Features/How/Pricing/Footer)
+- [ ] إضافة `landing.*` translations في `web/messages/ar.json` و `web/messages/en.json`
+- [ ] الالتزام بـ Tokens-only من `web/src/app/globals.css`
+
 ## Phase 2 — Supabase (Backend + Realtime)
 
 - [x] إضافة deps: `@supabase/supabase-js` + `@supabase/ssr`
@@ -32,20 +38,46 @@
 - [x] Schema SQL (patients/visits/settings/queue)
 - [x] استبدال mock data في Server pages بـ queries (مع fallback أثناء التطوير)
 - [x] Realtime subscription على `visits` (بدون polling افتراضيًا)
-- [ ] Payments flow: تحصيل/تحديث `paid` + شاشة تسوية المتبقيات
+- [x] Payments MVP: تحصيل/تحديث `paid` + تسوية المتبقيات + دفع إجمالي متبقي المريض
 - [ ] Auth + middleware لحماية routes حسب role
 - [ ] RLS policies + least-privilege (بدل UNRESTRICTED)
 
+## Phase 2.5 — Ops / Monitoring (Supabase)
+
+- [ ] Monitoring checklist: Logs/Realtime health/Backups/Alerts (وثّقها في docs)
+- [ ] حماية الإنتاج: تقليل الصلاحيات (تجنب grants الواسعة) + تفعيل RLS تدريجيًا
+- [ ] Rotate مفاتيح Supabase المستخدمة في التطوير لو تم مشاركتها/تسريبها
+
+## Deployment
+
+- [x] رفع المشروع على GitHub
+- [x] إنشاء repo منفصل لـ `web/` لتسهيل Deploy على Vercel
+- [ ] Vercel: ربط env vars + Deploy production + تثبيت الدومين
+
 ## بكرا نبدأ بإيه (اقتراح عملي)
 
-- (1) تثبيت Realtime 100%: تأكيد Replication/Realtime settings في Supabase + (اختياري) `REPLICA IDENTITY FULL` لو UPDATE مش بتتبعت.
-- (2) Payments MVP: من الاستقبال نقدر نسجّل المدفوع على الزيارة وتحديث المتبقي.
-- (3) Auth/Roles: شاشة login حقيقية + حماية routes (Reception/Doctor).
+- (1) Deploy production على Vercel (repo: clinicPro-web) + التأكد من `/ar/login`.
+- (2) Auth/Roles: شاشة login حقيقية + حماية routes (Reception/Doctor).
+- (3) RLS + سياسات مبدئية: منع أي كتابة من anon في الإنتاج.
+- (4) Monitoring: Logs + Backups + Alerts + Realtime health checklist.
 
 ## Phase 3 — Polishing + Ops
 
 - [ ] Tests (على الأقل smoke tests) + type-safety tightening
 - [ ] Deployment checklist (envs, migrations, backups)
+
+---
+
+## Plan — الأسبوع الجاي (Sprint صغير)
+
+1. Deploy ثابت
+   - Vercel Import من `clinicPro-web` + Env vars + التأكد من Routes
+2. أمان Supabase
+   - تفعيل RLS تدريجيًا + أقل صلاحيات ممكنة
+3. مراقبة وتشغيل
+   - توثيق Monitoring/Backups/Realtime health + Checklist للطوارئ
+4. تحسينات UX/Errors
+   - توحيد رسائل أخطاء الدفع/الحدود وتوطينها (AR/EN)
 
 ---
 

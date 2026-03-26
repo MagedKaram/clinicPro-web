@@ -20,17 +20,57 @@
   - `endDayAction`: إنهاء اليوم (إغلاق الحالات المفتوحة + reset counter)
   - `saveSettingsAction`: تحديث settings
   - `refreshDailyBalanceAction` / `getQueueStateAction`: refresh سريع للـ UI
+  - Payments/Billing:
+    - تسجيل دفعات في `payments` + تحديث `visits.paid`
+    - دعم دفع إجمالي متبقي المريض وتوزيع الدفع على الزيارات المنتهية (done) بدون overpay
+  - Patient File / Summaries:
+    - جلب ملف المريض (زيارات منتهية سابقة) + ملخص مالي مختصر للمريض
 
 ### Realtime (Browser)
 
 - `web/src/lib/hooks/useVisitsRealtime.ts`
   - subscription على `public.visits` مع debounced refresh
-  - polling مُعطّل افتراضيًا (true realtime) إلا إذا تم تمرير `fallbackPollMs`
+  - polling مُعطّل افتراضيًا (true realtime) مع خيار fallback polling عبر `fallbackPollMs`
 
 - `web/src/lib/supabase/client.ts`
   - singleton browser client لتفادي فتح sockets متعددة
 
 ---
+
+## Ops / Monitoring (مراقبة الداتا بيز وتشغيلها)
+
+> الهدف: checklist عملي علشان الإنتاج مايبقاش “blind”.
+
+### 1) Logs (Supabase)
+
+- **Database Logs**: راقب أخطاء SQL (خصوصًا RPCs) وأي `permission denied` بعد تفعيل RLS.
+- **API Logs**: راقب معدلات 4xx/5xx، وخصوصًا أخطاء insert/update على `visits` و`payments`.
+- **Auth Logs** (لما يتفعل): مراقبة تسجيل الدخول/فشل الجلسات.
+
+### 2) Realtime Health
+
+- تأكد إن `public.visits` ضمن publication `supabase_realtime`.
+- لو بدأت تلاحظ missing updates:
+  - راجع `replica identity`.
+  - فعّل `alter table public.visits replica identity full;` فقط عند الحاجة (يزود payload).
+- في الـ UI: فعل `fallbackPollMs` كحل تشغيلي سريع لو realtime متذبذب.
+
+### 3) Backups / Recovery
+
+- فعّل **PITR/Backups** حسب باقة Supabase.
+- احتفظ بنسخة من السكريبتات (schema/RPC/policies) داخل `docs/` كمرجع لاستعادة سريعة.
+
+### 4) Alerts (مقترحات بسيطة)
+
+- Alert على ارتفاع 5xx (API) أو أخطاء DB متكررة.
+- مراقبة الـ DB size/bandwidth لو Realtime payload كبير.
+- مراقبة latency للـ RPCs (allocate_ticket / call_next) لو الضغط زاد.
+
+### 5) Security Baseline (Production)
+
+- تجنّب grants الواسعة للـ `anon` في الإنتاج.
+- فعّل RLS تدريجيًا وابدأ بأبسط سياسات (قراءة/كتابة حسب الدور).
+- لو احتجت عمليات حساسة (زي توزيع دفعات عبر عدة rows) فكر في نقلها إلى RPC transaction بدل loop في server action.
 
 ## Realtime — تشغيل وحلول مشاكل شائعة
 

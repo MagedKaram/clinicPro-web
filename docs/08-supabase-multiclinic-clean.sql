@@ -1,12 +1,13 @@
--- Clinic Queue — Multi-Clinic Schema (Phase 3 Prep)
--- This script is a reference starting point. Apply on a NEW project or adapt as a migration.
--- Key idea: every operational table is scoped by clinic_id + RLS.
+-- Clinic Queue — Supabase Clean Multi-Clinic Bootstrap (Phase 3)
+-- Run this on a NEW Supabase project (SQL Editor).
+-- Creates: clinics, clinic_members, settings, patients, visits, payments, daily_counters, profiles
+-- Adds RLS + grants + RPCs.
 
 begin;
 
 create extension if not exists pgcrypto;
 
--- 1) Enums (reuse)
+-- Enums
 do $$ begin
   create type visit_status as enum ('waiting', 'serving', 'done');
 exception when duplicate_object then null; end $$;
@@ -15,8 +16,7 @@ do $$ begin
   create type visit_type as enum ('new', 'followup');
 exception when duplicate_object then null; end $$;
 
--- 2) Core multi-tenant tables
-
+-- Core
 create table if not exists public.clinics (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -34,7 +34,6 @@ create table if not exists public.clinic_members (
 create index if not exists clinic_members_user_idx on public.clinic_members(user_id);
 create index if not exists clinic_members_clinic_idx on public.clinic_members(clinic_id);
 
--- 3) Settings (per clinic)
 create table if not exists public.settings (
   clinic_id uuid primary key references public.clinics(id) on delete cascade,
   clinic_name text not null default '',
@@ -46,7 +45,6 @@ create table if not exists public.settings (
   updated_at timestamptz not null default now()
 );
 
--- 4) Patients (scoped)
 create table if not exists public.patients (
   id uuid primary key default gen_random_uuid(),
   clinic_id uuid not null references public.clinics(id) on delete cascade,
@@ -58,13 +56,10 @@ create table if not exists public.patients (
 
 create index if not exists patients_clinic_created_idx on public.patients(clinic_id, created_at desc);
 create index if not exists patients_name_idx on public.patients using gin (to_tsvector('simple', name));
-
--- Unique phone per clinic (ignore empty)
 create unique index if not exists patients_unique_phone_per_clinic
   on public.patients(clinic_id, phone)
   where phone <> '';
 
--- 5) Visits (scoped)
 create table if not exists public.visits (
   id uuid primary key default gen_random_uuid(),
   clinic_id uuid not null references public.clinics(id) on delete cascade,
@@ -90,7 +85,6 @@ create table if not exists public.visits (
 
 create index if not exists visits_clinic_date_status_idx
   on public.visits(clinic_id, visit_date, status, ticket);
-
 create unique index if not exists visits_unique_ticket_per_day_per_clinic
   on public.visits(clinic_id, visit_date, ticket);
 
@@ -107,7 +101,6 @@ do $$ begin
   for each row execute function public.set_updated_at();
 exception when duplicate_object then null; end $$;
 
--- 6) Payments (scoped)
 create table if not exists public.payments (
   id uuid primary key default gen_random_uuid(),
   clinic_id uuid not null references public.clinics(id) on delete cascade,
@@ -121,7 +114,6 @@ create table if not exists public.payments (
 create index if not exists payments_clinic_patient_idx on public.payments(clinic_id, patient_id, created_at);
 create index if not exists payments_clinic_visit_idx on public.payments(clinic_id, visit_id, created_at);
 
--- 7) Daily counters (scoped)
 create table if not exists public.daily_counters (
   clinic_id uuid not null references public.clinics(id) on delete cascade,
   day date not null,
@@ -129,7 +121,14 @@ create table if not exists public.daily_counters (
   primary key (clinic_id, day)
 );
 
--- 8) Helper functions for RLS
+-- Profiles (public mirror of auth.users email)
+create table if not exists public.profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  email text not null,
+  created_at timestamptz not null default now()
+);
+
+-- RLS helper
 create or replace function public.is_clinic_member(p_clinic_id uuid)
 returns boolean
 language sql
@@ -143,8 +142,7 @@ as $$
   );
 $$;
 
--- 9) RPCs (scoped)
-
+-- RPCs
 create or replace function public.allocate_ticket(p_clinic_id uuid, p_day date)
 returns int
 language plpgsql
@@ -184,14 +182,12 @@ begin
     raise exception 'Not a clinic member';
   end if;
 
-  -- close any existing serving (same clinic + day)
   update public.visits
      set status = 'done'
    where clinic_id = p_clinic_id
      and visit_date = p_day
      and status = 'serving';
 
-  -- lock and pick next waiting visit
   select v.id into v_next
   from public.visits v
   where v.clinic_id = p_clinic_id
@@ -212,8 +208,10 @@ begin
   return query select v_next;
 end $$;
 
--- 10) Clinic creation RPC (for signup)
--- Creates clinic + owner membership + default settings.
+-- If this script is re-run, avoid replace-errors caused by parameter-name changes
+-- on the same (text,text,text,text) function signature.
+drop function if exists public.create_clinic_for_owner(text, text, text, text);
+
 create or replace function public.create_clinic_for_owner(
   p_clinic_name text,
   p_doctor_name text,
@@ -240,11 +238,7 @@ begin
   values (v_clinic_id, auth.uid(), 'owner');
 
   insert into public.settings (
-    clinic_id,
-    clinic_name,
-    doctor_name,
-    address,
-    phone
+    clinic_id, clinic_name, doctor_name, address, phone
   ) values (
     v_clinic_id,
     coalesce(nullif(trim(p_clinic_name), ''), ''),
@@ -256,30 +250,30 @@ begin
   return v_clinic_id;
 end $$;
 
--- Compatibility overload (older clients / schema cache expectation)
--- Some deployments may call the RPC with a different parameter order.
-create or replace function public.create_clinic_for_owner(
-  p_address text,
-  p_clinic_name text,
-  p_doctor_name text,
-  p_phone text
-)
-returns uuid
+-- Trigger to keep profiles in sync
+create or replace function public.handle_new_user()
+returns trigger
 language plpgsql
 security definer
 set search_path = public
 as $$
 begin
-  return public.create_clinic_for_owner(
-    p_clinic_name,
-    p_doctor_name,
-    coalesce(p_address, ''),
-    coalesce(p_phone, '')
-  );
+  insert into public.profiles (id, email)
+  values (new.id, new.email)
+  on conflict (id) do update set email = excluded.email;
+  return new;
 end $$;
 
--- 11) RLS
+do $$
+begin
+  if not exists (select 1 from pg_trigger where tgname = 'on_auth_user_created') then
+    create trigger on_auth_user_created
+    after insert on auth.users
+    for each row execute function public.handle_new_user();
+  end if;
+end $$;
 
+-- RLS
 alter table public.clinics enable row level security;
 alter table public.clinic_members enable row level security;
 alter table public.settings enable row level security;
@@ -287,7 +281,9 @@ alter table public.patients enable row level security;
 alter table public.visits enable row level security;
 alter table public.payments enable row level security;
 alter table public.daily_counters enable row level security;
+alter table public.profiles enable row level security;
 
+-- Policies
 -- clinics: members can read their clinics
 do $$
 begin
@@ -359,10 +355,10 @@ begin
     from pg_policies
     where schemaname = 'public'
       and tablename = 'settings'
-      and policyname = 'settings_update_owner'
+      and policyname = 'settings_update_member'
   ) then
     execute $policy$
-      create policy settings_update_owner
+      create policy settings_update_member
       on public.settings
       for update
       to authenticated
@@ -456,28 +452,58 @@ begin
   end if;
 end $$;
 
--- 12) Grants
--- For production, prefer authenticated only.
+-- profiles: user can read their own profile
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'profiles'
+      and policyname = 'profiles_select_self'
+  ) then
+    execute $policy$
+      create policy profiles_select_self
+      on public.profiles
+      for select
+      to authenticated
+      using (id = auth.uid());
+    $policy$;
+  end if;
+end $$;
+
+-- Grants
 grant usage on schema public to authenticated;
 
 grant select on table public.clinics to authenticated;
 grant select on table public.clinic_members to authenticated;
-
 grant select, update on table public.settings to authenticated;
 grant select, insert, update, delete on table public.patients to authenticated;
 grant select, insert, update, delete on table public.visits to authenticated;
 grant select, insert, update, delete on table public.payments to authenticated;
 grant select, insert, update, delete on table public.daily_counters to authenticated;
+grant select on table public.profiles to authenticated;
 
 grant execute on function public.allocate_ticket(uuid, date) to authenticated;
 grant execute on function public.call_next(uuid, date) to authenticated;
+-- Both overloads share same SQL type signature (text,text,text,text)
+-- Grant once is enough, kept explicit for clarity.
 grant execute on function public.create_clinic_for_owner(text, text, text, text) to authenticated;
 
--- Grant the compatibility overload too
-grant execute on function public.create_clinic_for_owner(text, text, text, text) to authenticated;
+-- Realtime (safe, idempotent)
+do $$
+begin
+  -- Supabase uses the `supabase_realtime` publication for Postgres changes.
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
+    begin
+      alter publication supabase_realtime add table public.visits;
+    exception when duplicate_object then
+      null;
+    end;
+  end if;
+end $$;
 
 commit;
 
 -- Notes:
--- 1) If you need realtime, include public.visits in supabase_realtime publication.
--- 2) For larger clinics (many staff), add invitations flow + restrict create_clinic_for_owner.
+-- Realtime is enabled above for public.visits.

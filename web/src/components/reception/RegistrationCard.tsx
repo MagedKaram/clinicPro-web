@@ -13,6 +13,7 @@ type RegisterPayload = {
   patientId?: string;
   name: string;
   phone?: string;
+  nationalId?: string;
   address?: string;
   visitType: VisitType;
 };
@@ -66,6 +67,7 @@ export function RegistrationCard({
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [nationalId, setNationalId] = useState("");
   const [address, setAddress] = useState("");
 
   const [summaryBusy, setSummaryBusy] = useState(false);
@@ -133,6 +135,7 @@ export function RegistrationCard({
     setSelectedPatient(null);
     setName("");
     setPhone("");
+    setNationalId("");
     setAddress("");
     setSummary(null);
   }
@@ -178,6 +181,7 @@ export function RegistrationCard({
         patientId: selectedPatient?.id,
         name: finalName,
         phone: phone.trim() || undefined,
+        nationalId: nationalId.trim() || undefined,
         address: address.trim() || undefined,
         visitType,
       });
@@ -363,6 +367,16 @@ export function RegistrationCard({
                 placeholder={t("register.fields.addressPlaceholder")}
               />
             </div>
+          </div>
+
+          <div className="mb-4">
+            <InputLabel>{t("register.fields.nationalId")}</InputLabel>
+            <TextInput
+              value={nationalId}
+              onChange={(e) => setNationalId(e.target.value)}
+              placeholder={t("register.fields.nationalIdPlaceholder")}
+              maxLength={14}
+            />
           </div>
         </div>
       )}

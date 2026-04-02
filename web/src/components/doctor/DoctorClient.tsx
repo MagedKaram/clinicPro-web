@@ -163,6 +163,7 @@ export function DoctorClient({
     prescription: "",
     notes: "",
     price: settings.priceNew,
+    vitalSigns: {},
   });
 
   const formRef = useRef<VisitFormState>(form);
@@ -182,6 +183,7 @@ export function DoctorClient({
           prescription: "",
           notes: "",
           price: settings.priceNew,
+          vitalSigns: {},
         });
         return;
       }
@@ -190,6 +192,7 @@ export function DoctorClient({
         diagnosis: sv.diagnosis ?? "",
         prescription: sv.prescription ?? "",
         notes: sv.notes ?? "",
+        vitalSigns: {},
         price:
           typeof sv.price === "number" && sv.price > 0
             ? sv.price
@@ -298,6 +301,7 @@ export function DoctorClient({
           prescription: nextForm.prescription,
           notes: nextForm.notes,
           price: nextForm.price,
+          vitalSigns: nextForm.vitalSigns,
         });
       } catch (e) {
         const message = e instanceof Error ? e.message : String(e);

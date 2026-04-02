@@ -62,7 +62,9 @@
         "phone": "Phone",
         "phonePlaceholder": "01xxxxxxxxx",
         "address": "Address",
-        "addressPlaceholder": "City / Area"
+        "addressPlaceholder": "City / Area",
+        "nationalId": "National ID",
+        "nationalIdPlaceholder": "14 digits (optional)"
       },
       "visitType": {
         "label": "Visit type",
@@ -116,6 +118,12 @@
       "notePlaceholder": "Note (optional)",
       "fillRemaining": "Fill remaining",
       "submit": "💰 Record payment",
+      "paymentMethod": "Payment method",
+      "methods": {
+        "cash": "Cash",
+        "card": "Card",
+        "transfer": "Transfer"
+      },
       "invalidAmount": "Enter a valid amount"
     },
     "settings": {
@@ -129,7 +137,24 @@
         "priceFollowup": "Follow-up price (EGP)"
       },
       "save": "💾 Save",
-      "saved": "✅ Saved!"
+      "saved": "✅ Saved!",
+      "doctorProfile": {
+        "title": "Doctor Profile",
+        "fields": {
+          "fullName": "Full name",
+          "specialty": "Specialty",
+          "bio": "Bio",
+          "licenseNumber": "License number",
+          "phone": "Phone",
+          "avatar": "Profile photo"
+        },
+        "errors": {
+          "avatarUploadFailed": "Photo upload failed. Please try again.",
+          "avatarTooLarge": "Photo must be under 2MB."
+        },
+        "save": "💾 Save profile",
+        "saved": "✅ Saved!"
+      }
     },
     "alerts": {
       "missingName": "Please enter the full name",
@@ -205,7 +230,24 @@
         "billing": "Billing"
       },
       "billingLine": "Price: {price} | Paid: {paid} | Remaining: {remaining}",
-      "close": "Close"
+      "close": "Close",
+      "tabs": {
+        "visits": "Visits",
+        "medInfo": "Medical Info"
+      },
+      "medInfo": {
+        "title": "Medical History",
+        "chronicDiseases": "Chronic Diseases",
+        "allergies": "Allergies",
+        "medications": "Current Medications",
+        "surgeries": "Past Surgeries",
+        "familyHistory": "Family History",
+        "notes": "Notes",
+        "placeholder": "Type here... (comma-separate for lists)",
+        "save": "💾 Save",
+        "saved": "✅ Saved",
+        "saving": "Saving..."
+      }
     },
     "queue": {
       "title": "Queue",
@@ -241,7 +283,17 @@
       "extraCharge": "Extra charge",
       "extraChargePlaceholder": "0",
       "addExtra": "Add",
-      "currency": "EGP"
+      "currency": "EGP",
+      "vitals": {
+        "title": "Vital Signs (optional)",
+        "weight": "Weight (kg)",
+        "height": "Height (cm)",
+        "bpSystolic": "BP Systolic",
+        "bpDiastolic": "BP Diastolic",
+        "pulse": "Pulse",
+        "temp": "Temp (°C)",
+        "bloodSugar": "Blood Sugar"
+      }
     },
     "search": {
       "title": "Search patient",
@@ -281,23 +333,41 @@
   "signup": {
     "title": "Create account",
     "subtitle": "Create your clinic workspace",
+    "steps": {
+      "1": "Account info",
+      "2": "Clinic info",
+      "3": "Doctor info"
+    },
     "fields": {
       "email": "Email",
       "password": "Password",
       "clinicName": "Clinic name",
-      "doctorName": "Doctor name",
       "address": "Address (optional)",
-      "phone": "Phone (optional)"
+      "phone": "Phone (optional)",
+      "priceNew": "New visit price",
+      "priceFollowup": "Follow-up price",
+      "doctorName": "Doctor name",
+      "specialty": "Specialty",
+      "bio": "Bio (optional)",
+      "licenseNumber": "License number (optional)",
+      "avatar": "Doctor photo (optional)"
     },
     "placeholders": {
       "email": "name@clinic.com",
-      "password": "Create a password",
+      "password": "Min 8 characters",
       "clinicName": "e.g. Al Noor Clinic",
-      "doctorName": "e.g. Dr. Ahmed",
       "address": "",
-      "phone": ""
+      "phone": "",
+      "priceNew": "200",
+      "priceFollowup": "100",
+      "doctorName": "e.g. Dr. Ahmed",
+      "specialty": "e.g. Internal Medicine, Ophthalmology",
+      "bio": "",
+      "licenseNumber": ""
     },
     "cta": {
+      "next": "Next",
+      "back": "Back",
       "create": "Create",
       "loading": "Please wait…",
       "backToLogin": "Back to login"
@@ -309,7 +379,15 @@
     },
     "errors": {
       "notAuthenticated": "Not authenticated",
-      "unknown": "Something went wrong. Please try again."
+      "unknown": "Something went wrong. Please try again.",
+      "emailInvalid": "Please enter a valid email address.",
+      "passwordTooShort": "Password must be at least 8 characters.",
+      "clinicNameRequired": "Clinic name is required (min 2 characters).",
+      "doctorNameRequired": "Doctor name is required.",
+      "specialtyRequired": "Specialty is required.",
+      "emailAlreadyExists": "This email is already registered. You can sign in to check your clinic status.",
+      "avatarUploadFailed": "Photo upload failed. Please try again.",
+      "avatarTooLarge": "Photo must be under 2MB."
     }
   },
   "forgotPassword": {
@@ -450,6 +528,206 @@
       "rights": "© 2024 Clinic Queue. All rights reserved.",
       "company": "Clinic Queue",
       "tagline": "Modernizing healthcare management."
+    }
+  },
+  "clinicStatus": {
+    "title": "Clinic Status",
+    "clinicNameLabel": "Clinic: {name}",
+    "pending": {
+      "title": "Clinic request is under review",
+      "subtitle": "Your request was submitted. The admin will review and activate the clinic soon."
+    },
+    "rejected": {
+      "title": "Clinic request was rejected",
+      "subtitle": "You can submit a new request after updating the details.",
+      "reasonLabel": "Rejection reason: {reason}"
+    },
+    "cta": {
+      "goToSignup": "Submit a new request",
+      "reapply": "Re-apply",
+      "logout": "Sign out",
+      "backToLogin": "Back to login"
+    }
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "subtitle": "System stats and approvals",
+    "nav": {
+      "dashboard": "📈 Dashboard",
+      "approvals": "✅ Approvals",
+      "clinics": "🏥 Clinics",
+      "doctors": "👨‍⚕️ Doctors",
+      "patients": "🧑‍🤝‍🧑 Patients"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "A quick snapshot of key metrics",
+      "cards": {
+        "clinicsTotal": "Total clinics",
+        "clinicsActive": "Active clinics",
+        "pendingClinics": "Pending requests",
+        "doctors": "Doctors",
+        "patients": "Patients",
+        "visitsToday": "Visits today"
+      },
+      "charts": {
+        "visits7d": "Visits (last 7 days)",
+        "payments7d": "Payments (last 7 days)",
+        "clinicStatus": "Clinic status"
+      },
+      "status": {
+        "active": "Active",
+        "pending": "Pending",
+        "rejected": "Rejected"
+      }
+    },
+    "approvals": {
+      "title": "Approvals",
+      "subtitle": "Review and approve/reject clinic creation requests"
+    },
+    "pending": {
+      "title": "Pending clinic requests",
+      "empty": "No pending requests right now.",
+      "meta": "ID: {clinicId} · Requested by: {requestedBy}",
+      "requestedAt": "Requested at: {at}",
+      "fields": {
+        "doctor": "Doctor:",
+        "phone": "Phone:",
+        "address": "Address:"
+      },
+      "placeholders": {
+        "reason": "Rejection reason (optional)"
+      }
+    },
+    "cta": {
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "roles": {
+      "owner": "Owner",
+      "doctor": "Doctor",
+      "reception": "Receptionist"
+    },
+    "clinics": {
+      "empty": "No clinics yet.",
+      "error": "Failed to load clinics.",
+      "cta": {
+        "activate": "Activate clinic",
+        "deactivate": "Deactivate clinic"
+      },
+      "fields": {
+        "status": "Status",
+        "owner": "Owner",
+        "created": "Created"
+      },
+      "members": {
+        "title": "Clinic members",
+        "empty": "No members yet."
+      }
+    },
+    "doctors": {
+      "title": "Doctors",
+      "subtitle": "All doctor accounts across the system",
+      "empty": "No doctors found.",
+      "error": "Failed to load doctors.",
+      "fields": {
+        "details": "Details",
+        "roles": "Roles",
+        "clinicsCount": "Clinics",
+        "name": "Name",
+        "specialty": "Specialty"
+      }
+    },
+    "doctorDetails": {
+      "title": "Doctor details",
+      "subtitle": "Clinic memberships and account info",
+      "back": "Back",
+      "loadError": "Some details could not be loaded.",
+      "noProfile": "Profile not completed yet.",
+      "clinicsSummary": "{activeClinicsCount} active / {clinicsCount} total",
+      "fields": {
+        "name": "Name",
+        "email": "Email",
+        "roles": "Roles",
+        "clinics": "Clinics",
+        "createdAt": "Created"
+      },
+      "profile": {
+        "title": "Doctor profile",
+        "notSet": "Not set",
+        "specialty": "Specialty",
+        "bio": "Bio",
+        "licenseNumber": "License number",
+        "phone": "Phone"
+      },
+      "memberships": {
+        "title": "Memberships",
+        "subtitle": "Clinics this user belongs to",
+        "empty": "No clinic memberships found.",
+        "role": "Role: {role}",
+        "status": "Status: {status}"
+      }
+    },
+    "patients": {
+      "title": "Patients",
+      "subtitle": "Patients across all clinics",
+      "empty": "No patients found.",
+      "error": "Failed to load patients.",
+      "fields": {
+        "phone": "Phone",
+        "phoneEmpty": "Phone: -",
+        "clinic": "Clinic",
+        "clinicEmpty": "Clinic: -",
+        "gender": "Gender",
+        "bloodType": "Blood Type",
+        "dob": "Date of birth",
+        "details": "Details"
+      }
+    },
+    "patientDetails": {
+      "title": "Patient details",
+      "subtitle": "Demographics, medical info, and visit history",
+      "back": "Back",
+      "notSet": "—",
+      "sections": {
+        "demographics": "Demographics",
+        "guardian": "Guardian",
+        "dependents": "Dependents",
+        "medicalInfo": "Medical info",
+        "clinics": "Clinics visited",
+        "visits": "Visit history",
+        "payments": "Payments summary"
+      },
+      "fields": {
+        "name": "Name",
+        "phone": "Phone",
+        "gender": "Gender",
+        "bloodType": "Blood type",
+        "dob": "Date of birth",
+        "nationalId": "National ID",
+        "createdAt": "Registered",
+        "chronicDiseases": "Chronic diseases",
+        "allergies": "Allergies",
+        "medications": "Medications",
+        "surgeries": "Past surgeries",
+        "familyHistory": "Family history",
+        "notes": "Notes",
+        "linkedAt": "Linked",
+        "visitDate": "Date",
+        "visitType": "Type",
+        "diagnosis": "Diagnosis",
+        "price": "Price",
+        "paid": "Paid",
+        "remaining": "Remaining",
+        "total": "Total"
+      },
+      "empty": {
+        "medicalInfo": "No medical info recorded.",
+        "clinics": "No clinics linked.",
+        "visits": "No visits recorded.",
+        "payments": "No payments recorded.",
+        "dependents": "No dependents."
+      }
     }
   }
 }

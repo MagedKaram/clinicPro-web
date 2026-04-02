@@ -117,3 +117,38 @@
 ## ملاحظات
 
 - Phase 2 شغّالة (Supabase + actions + realtime + payments MVP). المتبقي: Auth/Roles + RLS + تحسينات تشغيل/مراقبة DB حسب الأولوية.
+
+## Group A — Schema sync ✅ (2026-04-01)
+
+✅ A1 — Updated TypeScript types: added Gender, BloodType, PaymentMethod, VitalSigns, ClinicPatient, PatientMedicalInfo, DoctorProfile, AuditLog, Payment; updated Patient (national_id, dob, gender, blood_type), Visit (doctor_id, vital_signs), PatientFile (medicalInfo) — 2026-04-01
+✅ A2 — Updated registerVisitForClinic: replaced direct insert with find_or_create_patient RPC; added nationalId param — 2026-04-01
+✅ A3 — Updated finishVisitForClinic: added vitalSigns + doctorId (from auth.uid()) to visit update — 2026-04-01
+✅ A4 — Updated getPatientFileForClinic: removed clinic_id filter (global patients), added patient_medical_info parallel fetch, returns medicalInfo — 2026-04-01
+✅ A5 — Updated addPayment: added payment_method (default cash) + discount (default 0) to payments insert — 2026-04-01
+✅ A6 — Updated getPatientsServer: switched from patients.clinic_id filter to clinic_patients bridge join — 2026-04-01
+✅ A7 — Updated RegistrationCard: added nationalId field + state; passes nationalId to registerVisitAction — 2026-04-01
+✅ A8 — Updated BillingPopup: added cash/card/transfer payment method selector; passes method to addPaymentAction — 2026-04-01
+✅ A9 — Updated VisitForm: added collapsible vital_signs section (weight, height, BP sys/dia, pulse, temp, blood_sugar) — 2026-04-01
+✅ A10 — New MedicalInfoEditor component + updated MedicalHistoryPopup with Visits/Med Info tabs; doctor can view and edit patient_medical_info — 2026-04-01
+✅ A11 — Updated admin patients page: removed clinic join, query global patients table, shows gender/blood_type/dob — 2026-04-01
+
+## Group B — Signup + Doctor profile ✅ (2026-04-01)
+
+✅ B1 — Extended SignupClient: added specialty/bio/licenseNumber fields; inserts doctor_profiles after create_clinic_for_owner RPC succeeds — 2026-04-01
+✅ B2 — Added DoctorProfileSection component to settings tab (owner/doctor only, hidden for reception); fetches + saves doctor_profiles — 2026-04-01
+✅ B3 — Created saveDoctorProfileAction: upserts doctor_profiles for auth.uid() — 2026-04-01
+✅ B4 — Admin doctors page: parallel-fetches doctor_profiles, shows name + specialty alongside roles/clinics count — 2026-04-01
+✅ B5 — Admin doctor detail page: parallel-fetches doctor_profiles, shows specialty/bio/license/phone card — 2026-04-01
+
+## Group C — Patient profile admin ✅ (2026-04-01)
+
+✅ C1 — Created /admin/patients/[patientId]: demographics, medical info, clinics visited, visit history, payments summary — all parallel fetched — 2026-04-01
+✅ C2 — Guardian display: shows guardian name + link if guardian_id set; shows dependents list with links — 2026-04-01
+
+## Group B-FIX — Bug fixes from Group B (2026-04-02)
+
+✅ BF1 — Admin doctors pages: now fetches doctor_profiles (full_name, specialty) + profiles (email); display chain full_name || email || userId — 2026-04-02
+✅ BF2 — SignupClient redesigned as 3-step form: Step 1 account, Step 2 clinic info (with prices), Step 3 doctor info; per-step validation; step indicator ①②③ — 2026-04-02
+✅ BF3 — Re-application flow: clinic-status shows "إعادة التقديم" for rejected clinics → /signup?mode=clinic-only; email-exists error shows inline login link — 2026-04-02
+
+✅ BF2-fix — doctor_profiles now saves correctly (required, not best-effort) + avatar_url field added; avatar upload in signup Step 3 + DoctorProfileSection; avatar shown in admin doctors list + detail pages — 2026-04-02

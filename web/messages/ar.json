@@ -62,7 +62,9 @@
         "phone": "رقم التليفون",
         "phonePlaceholder": "01xxxxxxxxx",
         "address": "العنوان",
-        "addressPlaceholder": "المدينة / الحي"
+        "addressPlaceholder": "المدينة / الحي",
+        "nationalId": "الرقم القومي",
+        "nationalIdPlaceholder": "14 رقم (اختياري)"
       },
       "visitType": {
         "label": "نوع الزيارة",
@@ -116,7 +118,13 @@
       "notePlaceholder": "ملاحظة (اختياري)",
       "fillRemaining": "املأ المتبقي",
       "submit": "💰 تسجيل الدفع",
-      "invalidAmount": "ادخل مبلغ صحيح"
+      "invalidAmount": "ادخل مبلغ صحيح",
+      "paymentMethod": "طريقة الدفع",
+      "methods": {
+        "cash": "كاش",
+        "card": "كارت",
+        "transfer": "تحويل"
+      }
     },
     "settings": {
       "title": "إعدادات العيادة",
@@ -129,7 +137,24 @@
         "priceFollowup": "سعر المتابعة (جنيه)"
       },
       "save": "💾 حفظ",
-      "saved": "✅ تم الحفظ!"
+      "saved": "✅ تم الحفظ!",
+      "doctorProfile": {
+        "title": "بيانات الدكتور",
+        "fields": {
+          "fullName": "الاسم الكامل",
+          "specialty": "التخصص",
+          "bio": "نبذة",
+          "licenseNumber": "رقم الترخيص",
+          "phone": "الموبايل",
+          "avatar": "الصورة الشخصية"
+        },
+        "errors": {
+          "avatarUploadFailed": "فشل رفع الصورة. حاول مرة أخرى.",
+          "avatarTooLarge": "حجم الصورة يجب أن يكون أقل من 2MB."
+        },
+        "save": "💾 حفظ البيانات",
+        "saved": "✅ تم الحفظ!"
+      }
     },
     "alerts": {
       "missingName": "من فضلك اكتب الاسم الكامل",
@@ -205,7 +230,24 @@
         "billing": "الحساب"
       },
       "billingLine": "السعر: {price} | المدفوع: {paid} | المتبقي: {remaining}",
-      "close": "إغلاق"
+      "close": "إغلاق",
+      "tabs": {
+        "visits": "الزيارات",
+        "medInfo": "المعلومات الطبية"
+      },
+      "medInfo": {
+        "title": "التاريخ المرضي",
+        "chronicDiseases": "الأمراض المزمنة",
+        "allergies": "الحساسية",
+        "medications": "الأدوية الحالية",
+        "surgeries": "العمليات السابقة",
+        "familyHistory": "التاريخ العائلي",
+        "notes": "ملاحظات",
+        "placeholder": "اكتب هنا... (افصل بفاصلة للقوائم)",
+        "save": "💾 حفظ",
+        "saved": "✅ تم الحفظ",
+        "saving": "جاري الحفظ..."
+      }
     },
     "queue": {
       "title": "قائمة الانتظار",
@@ -241,7 +283,17 @@
       "extraCharge": "إضافة مبلغ زيادة",
       "extraChargePlaceholder": "0",
       "addExtra": "إضافة",
-      "currency": "ج"
+      "currency": "ج",
+      "vitals": {
+        "title": "العلامات الحيوية (اختياري)",
+        "weight": "الوزن (كجم)",
+        "height": "الطول (سم)",
+        "bpSystolic": "ضغط انقباضي",
+        "bpDiastolic": "ضغط انبساطي",
+        "pulse": "النبض",
+        "temp": "الحرارة (°C)",
+        "bloodSugar": "سكر الدم"
+      }
     },
     "search": {
       "title": "بحث عن مريض",
@@ -281,23 +333,41 @@
   "signup": {
     "title": "إنشاء حساب",
     "subtitle": "أنشئ مساحة عيادتك",
+    "steps": {
+      "1": "بيانات الحساب",
+      "2": "بيانات العيادة",
+      "3": "بيانات الدكتور"
+    },
     "fields": {
       "email": "الإيميل",
       "password": "كلمة المرور",
       "clinicName": "اسم العيادة",
-      "doctorName": "اسم الدكتور",
       "address": "العنوان (اختياري)",
-      "phone": "الموبايل (اختياري)"
+      "phone": "الموبايل (اختياري)",
+      "priceNew": "سعر كشف جديد",
+      "priceFollowup": "سعر كشف متابعة",
+      "doctorName": "اسم الدكتور",
+      "specialty": "التخصص",
+      "bio": "نبذة (اختياري)",
+      "licenseNumber": "رقم الترخيص (اختياري)",
+      "avatar": "صورة الدكتور (اختياري)"
     },
     "placeholders": {
       "email": "name@clinic.com",
-      "password": "اكتب كلمة مرور",
+      "password": "8 أحرف على الأقل",
       "clinicName": "مثال: عيادة النور",
-      "doctorName": "مثال: د. أحمد",
       "address": "",
-      "phone": ""
+      "phone": "",
+      "priceNew": "200",
+      "priceFollowup": "100",
+      "doctorName": "مثال: د. أحمد",
+      "specialty": "مثال: باطنة، رمد، أطفال",
+      "bio": "",
+      "licenseNumber": ""
     },
     "cta": {
+      "next": "التالي",
+      "back": "السابق",
       "create": "إنشاء",
       "loading": "لحظة…",
       "backToLogin": "رجوع لتسجيل الدخول"
@@ -309,7 +379,15 @@
     },
     "errors": {
       "notAuthenticated": "غير مسجل دخول",
-      "unknown": "حصلت مشكلة. جرّب تاني."
+      "unknown": "حصلت مشكلة. جرّب تاني.",
+      "emailInvalid": "من فضلك اكتب إيميل صحيح.",
+      "passwordTooShort": "كلمة المرور لازم تكون 8 أحرف على الأقل.",
+      "clinicNameRequired": "اسم العيادة مطلوب (حرفين على الأقل).",
+      "doctorNameRequired": "اسم الدكتور مطلوب.",
+      "specialtyRequired": "التخصص مطلوب.",
+      "emailAlreadyExists": "هذا البريد الإلكتروني مسجل بالفعل، يمكنك تسجيل الدخول لمتابعة حالة عيادتك.",
+      "avatarUploadFailed": "فشل رفع الصورة. حاول مرة أخرى.",
+      "avatarTooLarge": "حجم الصورة يجب أن يكون أقل من 2MB."
     }
   },
   "forgotPassword": {
@@ -450,6 +528,206 @@
       "rights": "© 2024 Clinic Queue. جميع الحقوق محفوظة.",
       "company": "Clinic Queue",
       "tagline": "نحدّث إدارة الرعاية الصحية."
+    }
+  },
+  "clinicStatus": {
+    "title": "حالة العيادة",
+    "clinicNameLabel": "العيادة: {name}",
+    "pending": {
+      "title": "طلب إنشاء العيادة تحت المراجعة",
+      "subtitle": "تم إرسال طلبك. الأدمن هيراجع البيانات ويفعّل العيادة قريباً."
+    },
+    "rejected": {
+      "title": "تم رفض طلب إنشاء العيادة",
+      "subtitle": "تقدر تقدّم طلب جديد بعد تعديل البيانات.",
+      "reasonLabel": "سبب الرفض: {reason}"
+    },
+    "cta": {
+      "goToSignup": "تقديم طلب جديد",
+      "reapply": "إعادة التقديم",
+      "logout": "تسجيل الخروج",
+      "backToLogin": "رجوع لتسجيل الدخول"
+    }
+  },
+  "admin": {
+    "title": "لوحة الأدمن",
+    "subtitle": "إحصائيات وموافقات النظام",
+    "nav": {
+      "dashboard": "📈 الداشبورد",
+      "approvals": "✅ الموافقات",
+      "clinics": "🏥 العيادات",
+      "doctors": "👨‍⚕️ الدكاترة",
+      "patients": "🧑‍🤝‍🧑 المرضى"
+    },
+    "dashboard": {
+      "title": "الداشبورد",
+      "subtitle": "نظرة عامة سريعة على الأداء والأرقام",
+      "cards": {
+        "clinicsTotal": "إجمالي العيادات",
+        "clinicsActive": "عيادات مفعّلة",
+        "pendingClinics": "طلبات معلّقة",
+        "doctors": "الدكاترة",
+        "patients": "المرضى",
+        "visitsToday": "زيارات اليوم"
+      },
+      "charts": {
+        "visits7d": "زيارات (آخر 7 أيام)",
+        "payments7d": "التحصيل (آخر 7 أيام)",
+        "clinicStatus": "حالة العيادات"
+      },
+      "status": {
+        "active": "مفعّلة",
+        "pending": "معلّقة",
+        "rejected": "مرفوضة"
+      }
+    },
+    "approvals": {
+      "title": "الموافقات",
+      "subtitle": "مراجعة وتفعيل/رفض طلبات إنشاء العيادات"
+    },
+    "pending": {
+      "title": "طلبات عيادات معلّقة",
+      "empty": "لا توجد طلبات معلّقة حالياً.",
+      "meta": "ID: {clinicId} · صاحب الطلب: {requestedBy}",
+      "requestedAt": "وقت الطلب: {at}",
+      "fields": {
+        "doctor": "الطبيب:",
+        "phone": "هاتف:",
+        "address": "العنوان:"
+      },
+      "placeholders": {
+        "reason": "سبب الرفض (اختياري)"
+      }
+    },
+    "cta": {
+      "approve": "✅ موافقة",
+      "reject": "⛔ رفض"
+    },
+    "roles": {
+      "owner": "مالك",
+      "doctor": "دكتور",
+      "reception": "استقبال"
+    },
+    "clinics": {
+      "empty": "لا توجد عيادات بعد.",
+      "error": "تعذر تحميل العيادات.",
+      "cta": {
+        "activate": "✅ تفعيل العيادة",
+        "deactivate": "⛔ تعطيل العيادة"
+      },
+      "fields": {
+        "status": "الحالة",
+        "owner": "المالك",
+        "created": "تاريخ الإنشاء"
+      },
+      "members": {
+        "title": "أعضاء العيادة",
+        "empty": "لا يوجد أعضاء حتى الآن."
+      }
+    },
+    "doctors": {
+      "title": "الدكاترة",
+      "subtitle": "قائمة بكل حسابات الدكاترة على النظام",
+      "empty": "لا توجد حسابات دكاترة حالياً.",
+      "error": "تعذر تحميل الدكاترة.",
+      "fields": {
+        "details": "تفاصيل",
+        "roles": "الأدوار",
+        "clinicsCount": "عدد العيادات",
+        "name": "الاسم",
+        "specialty": "التخصص"
+      }
+    },
+    "doctorDetails": {
+      "title": "تفاصيل الدكتور",
+      "subtitle": "عضويات العيادات وبيانات الحساب",
+      "back": "رجوع",
+      "loadError": "تعذر تحميل بعض البيانات.",
+      "noProfile": "لم يكمل بروفايله بعد.",
+      "clinicsSummary": "{activeClinicsCount} نشطة / {clinicsCount} إجمالي",
+      "fields": {
+        "name": "الاسم",
+        "email": "الإيميل",
+        "roles": "الأدوار",
+        "clinics": "العيادات",
+        "createdAt": "تاريخ الإنشاء"
+      },
+      "profile": {
+        "title": "بيانات الدكتور",
+        "notSet": "غير محدد",
+        "specialty": "التخصص",
+        "bio": "نبذة",
+        "licenseNumber": "رقم الترخيص",
+        "phone": "الموبايل"
+      },
+      "memberships": {
+        "title": "العضويات",
+        "subtitle": "العيادات اللي الحساب ده عضو فيها",
+        "empty": "لا توجد عضويات عيادات لهذا الحساب.",
+        "role": "الدور: {role}",
+        "status": "الحالة: {status}"
+      }
+    },
+    "patients": {
+      "title": "المرضى",
+      "subtitle": "قائمة المرضى عبر كل العيادات",
+      "empty": "لا يوجد مرضى حالياً.",
+      "error": "تعذر تحميل المرضى.",
+      "fields": {
+        "phone": "هاتف",
+        "phoneEmpty": "هاتف: -",
+        "clinic": "العيادة",
+        "clinicEmpty": "العيادة: -",
+        "gender": "الجنس",
+        "bloodType": "فصيلة الدم",
+        "dob": "الميلاد",
+        "details": "تفاصيل"
+      }
+    },
+    "patientDetails": {
+      "title": "تفاصيل المريض",
+      "subtitle": "البيانات الشخصية والطبية وسجل الزيارات",
+      "back": "رجوع",
+      "notSet": "—",
+      "sections": {
+        "demographics": "البيانات الشخصية",
+        "guardian": "ولي الأمر",
+        "dependents": "المعالون",
+        "medicalInfo": "البيانات الطبية",
+        "clinics": "العيادات المرتبطة",
+        "visits": "سجل الزيارات",
+        "payments": "ملخص المدفوعات"
+      },
+      "fields": {
+        "name": "الاسم",
+        "phone": "الهاتف",
+        "gender": "الجنس",
+        "bloodType": "فصيلة الدم",
+        "dob": "الميلاد",
+        "nationalId": "الرقم القومي",
+        "createdAt": "تاريخ التسجيل",
+        "chronicDiseases": "أمراض مزمنة",
+        "allergies": "الحساسية",
+        "medications": "الأدوية الحالية",
+        "surgeries": "عمليات سابقة",
+        "familyHistory": "تاريخ الأسرة المرضي",
+        "notes": "ملاحظات",
+        "linkedAt": "تاريخ الربط",
+        "visitDate": "التاريخ",
+        "visitType": "النوع",
+        "diagnosis": "التشخيص",
+        "price": "السعر",
+        "paid": "مدفوع",
+        "remaining": "متبقي",
+        "total": "الإجمالي"
+      },
+      "empty": {
+        "medicalInfo": "لا توجد بيانات طبية مسجّلة.",
+        "clinics": "لا توجد عيادات مرتبطة.",
+        "visits": "لا توجد زيارات مسجّلة.",
+        "payments": "لا توجد مدفوعات مسجّلة.",
+        "dependents": "لا يوجد معالون."
+      }
     }
   }
 }

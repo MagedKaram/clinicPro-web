@@ -22,6 +22,7 @@
   --rec-soft-primary-2: color-mix(in srgb, var(--rec-primary) 18%, white);
   --rec-soft-followup: color-mix(in srgb, var(--rec-followup) 12%, white);
   --rec-soft-accent: color-mix(in srgb, var(--rec-accent) 14%, white);
+  --rec-surface: color-mix(in srgb, var(--rec-primary) 5%, white);
 
   /* Semantic */
   --success: #2e7d32;
@@ -79,6 +80,7 @@
   --color-rec-soft-primary-2: var(--rec-soft-primary-2);
   --color-rec-soft-followup: var(--rec-soft-followup);
   --color-rec-soft-accent: var(--rec-soft-accent);
+  --color-rec-surface: var(--rec-surface);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);

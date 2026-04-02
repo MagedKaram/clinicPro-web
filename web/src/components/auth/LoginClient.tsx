@@ -54,10 +54,18 @@ export function LoginClient() {
         return;
       }
 
+      // Admins should not be forced through clinic creation.
+      const { data: isAdmin, error: isAdminError } =
+        await supabase.rpc("is_admin");
+      if (!isAdminError && isAdmin) {
+        router.push(`/${locale}/admin`);
+        return;
+      }
+
       // If the user has no clinic yet, send them to signup to create one.
       const { data: membership, error: membershipError } = await supabase
         .from("clinic_members")
-        .select("clinic_id")
+        .select("clinic_id, clinics(status)")
         .eq("user_id", userId)
         .limit(1)
         .maybeSingle();
@@ -85,6 +93,17 @@ export function LoginClient() {
         ?.clinic_id;
       if (typeof clinicId !== "string" || clinicId.length === 0) {
         router.push(`/${locale}/signup`);
+        return;
+      }
+
+      const clinicInfo = (
+        membership as {
+          clinics?: { status?: unknown } | null;
+        } | null
+      )?.clinics;
+      const statusRaw = clinicInfo?.status;
+      if (statusRaw === "pending" || statusRaw === "rejected") {
+        router.push(`/${locale}/clinic-status`);
         return;
       }
 

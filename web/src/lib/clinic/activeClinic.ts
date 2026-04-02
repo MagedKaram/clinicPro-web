@@ -2,6 +2,15 @@ import { redirect } from "next/navigation";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+type ClinicStatus = "pending" | "active" | "rejected";
+
+function normalizeClinicStatus(value: unknown): ClinicStatus | null {
+  if (value === "pending" || value === "active" || value === "rejected") {
+    return value;
+  }
+  return null;
+}
+
 async function getServerUserId(): Promise<string | null> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.getUser();
@@ -22,7 +31,7 @@ export async function requireActiveClinicId(options: {
 
   const { data: membership, error } = await supabase
     .from("clinic_members")
-    .select("clinic_id")
+    .select("clinic_id, clinics(status)")
     .eq("user_id", userId)
     .order("created_at", { ascending: true })
     .limit(1)
@@ -47,6 +56,19 @@ export async function requireActiveClinicId(options: {
     redirect(`/${options.locale}/signup`);
   }
 
+  // Backward-compatible: if schema doesn't have clinics.status yet,
+  // treat as active and continue.
+  const clinicInfo = (
+    membership as {
+      clinics?: { status?: unknown } | null;
+    } | null
+  )?.clinics;
+  const statusRaw = clinicInfo?.status;
+  const status = normalizeClinicStatus(statusRaw);
+  if (status && status !== "active") {
+    redirect(`/${options.locale}/clinic-status`);
+  }
+
   return clinicId;
 }
 
@@ -60,7 +82,7 @@ export async function requireActiveClinicIdForAction(): Promise<string> {
 
   const { data: membership, error } = await supabase
     .from("clinic_members")
-    .select("clinic_id")
+    .select("clinic_id, clinics(status)")
     .eq("user_id", userId)
     .order("created_at", { ascending: true })
     .limit(1)
@@ -85,6 +107,17 @@ export async function requireActiveClinicIdForAction(): Promise<string> {
   const clinicId = (membership as { clinic_id?: unknown } | null)?.clinic_id;
   if (typeof clinicId !== "string" || clinicId.length === 0) {
     throw new Error("No clinic membership");
+  }
+
+  const clinicInfo = (
+    membership as {
+      clinics?: { status?: unknown } | null;
+    } | null
+  )?.clinics;
+  const statusRaw = clinicInfo?.status;
+  const status = normalizeClinicStatus(statusRaw);
+  if (status && status !== "active") {
+    throw new Error("Clinic is not active");
   }
 
   return clinicId;

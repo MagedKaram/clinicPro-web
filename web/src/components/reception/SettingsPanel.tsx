@@ -5,6 +5,7 @@ import type { Settings } from "@/types/clinic";
 import { cn } from "@/lib/utils";
 import { Card, CardTitle } from "@/components/reception/Card";
 import { useTranslations } from "next-intl";
+import { DoctorProfileSection } from "@/components/reception/DoctorProfileSection";
 
 function InputLabel({ children }: { children: string }) {
   return (
@@ -31,10 +32,12 @@ export function SettingsPanel({
   settings,
   onSave,
   busy,
+  clinicId,
 }: {
   settings: Settings;
   onSave: (next: Settings) => Promise<void>;
   busy?: boolean;
+  clinicId: string;
 }) {
   const t = useTranslations("reception");
   const [draft, setDraft] = useState<Settings>(() => settings);
@@ -149,6 +152,8 @@ export function SettingsPanel({
           {t("settings.saved")}
         </div>
       </Card>
+
+      <DoctorProfileSection clinicId={clinicId} />
     </div>
   );
 }

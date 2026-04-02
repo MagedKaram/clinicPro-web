@@ -16,10 +16,22 @@ do $$ begin
   create type visit_type as enum ('new', 'followup');
 exception when duplicate_object then null; end $$;
 
+do $$ begin
+  create type clinic_status as enum ('pending', 'active', 'rejected');
+exception when duplicate_object then null; end $$;
+
 -- Core
 create table if not exists public.clinics (
   id uuid primary key default gen_random_uuid(),
   name text not null,
+  status clinic_status not null default 'pending',
+  requested_by uuid references auth.users(id) on delete set null,
+  requested_at timestamptz not null default now(),
+  approved_by uuid references auth.users(id) on delete set null,
+  approved_at timestamptz,
+  rejected_by uuid references auth.users(id) on delete set null,
+  rejected_at timestamptz,
+  rejection_reason text not null default '',
   created_at timestamptz not null default now()
 );
 
@@ -128,6 +140,26 @@ create table if not exists public.profiles (
   created_at timestamptz not null default now()
 );
 
+-- App admins (private table; do NOT grant direct access to authenticated)
+create table if not exists public.app_admins (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.app_admins a
+    where a.user_id = auth.uid()
+  );
+$$;
+
 -- RLS helper
 create or replace function public.is_clinic_member(p_clinic_id uuid)
 returns boolean
@@ -137,8 +169,10 @@ as $$
   select exists (
     select 1
     from public.clinic_members m
+    join public.clinics c on c.id = m.clinic_id
     where m.clinic_id = p_clinic_id
       and m.user_id = auth.uid()
+      and c.status = 'active'
   );
 $$;
 
@@ -225,14 +259,38 @@ set search_path = public
 as $$
 declare
   v_clinic_id uuid;
+  v_clean_clinic_name text;
+  v_clean_doctor_name text;
 begin
   if auth.uid() is null then
     raise exception 'Not authenticated';
   end if;
 
+  v_clean_clinic_name := coalesce(nullif(trim(p_clinic_name), ''), '');
+  v_clean_doctor_name := coalesce(nullif(trim(p_doctor_name), ''), '');
+
+  if v_clean_clinic_name = '' then
+    raise exception 'Clinic name is required';
+  end if;
+
+  if v_clean_doctor_name = '' then
+    raise exception 'Doctor name is required';
+  end if;
+
   insert into public.clinics (name)
-  values (coalesce(nullif(trim(p_clinic_name), ''), ''))
+  values (v_clean_clinic_name)
   returning id into v_clinic_id;
+
+  update public.clinics
+     set status = 'pending',
+         requested_by = auth.uid(),
+         requested_at = now(),
+         approved_by = null,
+         approved_at = null,
+         rejected_by = null,
+         rejected_at = null,
+         rejection_reason = ''
+   where id = v_clinic_id;
 
   insert into public.clinic_members (clinic_id, user_id, role)
   values (v_clinic_id, auth.uid(), 'owner');
@@ -241,13 +299,55 @@ begin
     clinic_id, clinic_name, doctor_name, address, phone
   ) values (
     v_clinic_id,
-    coalesce(nullif(trim(p_clinic_name), ''), ''),
-    coalesce(nullif(trim(p_doctor_name), ''), ''),
+    v_clean_clinic_name,
+    v_clean_doctor_name,
     coalesce(p_address, ''),
     coalesce(p_phone, '')
   );
 
   return v_clinic_id;
+end $$;
+
+create or replace function public.approve_clinic(p_clinic_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not public.is_admin() then
+    raise exception 'Not an admin';
+  end if;
+
+  update public.clinics
+     set status = 'active',
+         approved_by = auth.uid(),
+         approved_at = now(),
+         rejected_by = null,
+         rejected_at = null,
+         rejection_reason = ''
+   where id = p_clinic_id;
+end $$;
+
+create or replace function public.reject_clinic(p_clinic_id uuid, p_reason text default '')
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not public.is_admin() then
+    raise exception 'Not an admin';
+  end if;
+
+  update public.clinics
+     set status = 'rejected',
+         rejected_by = auth.uid(),
+         rejected_at = now(),
+         rejection_reason = coalesce(p_reason, ''),
+         approved_by = null,
+         approved_at = null
+   where id = p_clinic_id;
 end $$;
 
 -- Trigger to keep profiles in sync
@@ -282,6 +382,7 @@ alter table public.visits enable row level security;
 alter table public.payments enable row level security;
 alter table public.daily_counters enable row level security;
 alter table public.profiles enable row level security;
+alter table public.app_admins enable row level security;
 
 -- Policies
 -- clinics: members can read their clinics
@@ -304,6 +405,67 @@ begin
         where m.clinic_id = clinics.id
           and m.user_id = auth.uid()
       ));
+    $policy$;
+  end if;
+end $$;
+
+-- clinic_members: admins can read all memberships
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'clinic_members'
+      and policyname = 'clinic_members_select_admin'
+  ) then
+    execute $policy$
+      create policy clinic_members_select_admin
+      on public.clinic_members
+      for select
+      to authenticated
+      using (public.is_admin());
+    $policy$;
+  end if;
+end $$;
+
+-- clinics: admins can read all clinics (including pending)
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'clinics'
+      and policyname = 'clinics_select_admin'
+  ) then
+    execute $policy$
+      create policy clinics_select_admin
+      on public.clinics
+      for select
+      to authenticated
+      using (public.is_admin());
+    $policy$;
+  end if;
+end $$;
+
+-- clinics: admins can approve/reject clinics
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'clinics'
+      and policyname = 'clinics_update_admin'
+  ) then
+    execute $policy$
+      create policy clinics_update_admin
+      on public.clinics
+      for update
+      to authenticated
+      using (public.is_admin())
+      with check (public.is_admin());
     $policy$;
   end if;
 end $$;
@@ -368,6 +530,26 @@ begin
   end if;
 end $$;
 
+-- settings: admins can read all settings
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'settings'
+      and policyname = 'settings_select_admin'
+  ) then
+    execute $policy$
+      create policy settings_select_admin
+      on public.settings
+      for select
+      to authenticated
+      using (public.is_admin());
+    $policy$;
+  end if;
+end $$;
+
 -- patients
 do $$
 begin
@@ -385,6 +567,26 @@ begin
       to authenticated
       using (public.is_clinic_member(clinic_id))
       with check (public.is_clinic_member(clinic_id));
+    $policy$;
+  end if;
+end $$;
+
+-- patients: admins can read all patients
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'patients'
+      and policyname = 'patients_select_admin'
+  ) then
+    execute $policy$
+      create policy patients_select_admin
+      on public.patients
+      for select
+      to authenticated
+      using (public.is_admin());
     $policy$;
   end if;
 end $$;
@@ -410,6 +612,26 @@ begin
   end if;
 end $$;
 
+-- visits: admins can read all visits
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'visits'
+      and policyname = 'visits_select_admin'
+  ) then
+    execute $policy$
+      create policy visits_select_admin
+      on public.visits
+      for select
+      to authenticated
+      using (public.is_admin());
+    $policy$;
+  end if;
+end $$;
+
 -- payments
 do $$
 begin
@@ -427,6 +649,26 @@ begin
       to authenticated
       using (public.is_clinic_member(clinic_id))
       with check (public.is_clinic_member(clinic_id));
+    $policy$;
+  end if;
+end $$;
+
+-- payments: admins can read all payments
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'payments'
+      and policyname = 'payments_select_admin'
+  ) then
+    execute $policy$
+      create policy payments_select_admin
+      on public.payments
+      for select
+      to authenticated
+      using (public.is_admin());
     $policy$;
   end if;
 end $$;
@@ -452,6 +694,26 @@ begin
   end if;
 end $$;
 
+-- daily counters: admins can read all counters
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'daily_counters'
+      and policyname = 'daily_counters_select_admin'
+  ) then
+    execute $policy$
+      create policy daily_counters_select_admin
+      on public.daily_counters
+      for select
+      to authenticated
+      using (public.is_admin());
+    $policy$;
+  end if;
+end $$;
+
 -- profiles: user can read their own profile
 do $$
 begin
@@ -472,6 +734,26 @@ begin
   end if;
 end $$;
 
+-- profiles: admins can read all profiles
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'profiles'
+      and policyname = 'profiles_select_admin'
+  ) then
+    execute $policy$
+      create policy profiles_select_admin
+      on public.profiles
+      for select
+      to authenticated
+      using (public.is_admin());
+    $policy$;
+  end if;
+end $$;
+
 -- Grants
 grant usage on schema public to authenticated;
 
@@ -486,9 +768,12 @@ grant select on table public.profiles to authenticated;
 
 grant execute on function public.allocate_ticket(uuid, date) to authenticated;
 grant execute on function public.call_next(uuid, date) to authenticated;
+grant execute on function public.is_admin() to authenticated;
 -- Both overloads share same SQL type signature (text,text,text,text)
 -- Grant once is enough, kept explicit for clarity.
 grant execute on function public.create_clinic_for_owner(text, text, text, text) to authenticated;
+grant execute on function public.approve_clinic(uuid) to authenticated;
+grant execute on function public.reject_clinic(uuid, text) to authenticated;
 
 -- Realtime (safe, idempotent)
 do $$

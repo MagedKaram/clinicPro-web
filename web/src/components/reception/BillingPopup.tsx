@@ -4,14 +4,14 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
-import type { VisitBilling } from "@/types/clinic";
+import type { PaymentMethod, VisitBilling } from "@/types/clinic";
 
 export type BillingPopupProps = {
   open: boolean;
   busy?: boolean;
   data: VisitBilling | null;
   onClose: () => void;
-  onSubmit: (payload: { amount: number; note: string }) => void;
+  onSubmit: (payload: { amount: number; note: string; method: PaymentMethod }) => void;
 };
 
 export function BillingPopup({
@@ -24,6 +24,7 @@ export function BillingPopup({
   const t = useTranslations("reception");
   const [amount, setAmount] = useState<string>("");
   const [note, setNote] = useState<string>("");
+  const [method, setMethod] = useState<PaymentMethod>("cash");
 
   const visitRemaining = data ? Math.max(0, data.visitRemaining) : 0;
   const patientRemaining = data ? Math.max(0, data.patientRemaining) : 0;
@@ -145,6 +146,25 @@ export function BillingPopup({
                 {t("billing.addPayment")}
               </label>
 
+              <div className="flex gap-1.5 mb-3">
+                {(["cash", "card", "transfer"] as PaymentMethod[]).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => setMethod(m)}
+                    disabled={Boolean(busy)}
+                    className={cn(
+                      "flex-1 py-1.5 rounded-xl text-[0.8rem] font-bold border transition-colors cursor-pointer",
+                      method === m
+                        ? "bg-rec-primary text-rec-card border-rec-primary"
+                        : "bg-rec-bg text-rec-text border-rec-border",
+                    )}
+                  >
+                    {t(`billing.methods.${m}`)}
+                  </button>
+                ))}
+              </div>
+
               <div className="flex gap-2 mb-2">
                 <input
                   type="number"
@@ -187,7 +207,7 @@ export function BillingPopup({
                   onClick={() => {
                     const n = Number(amount);
                     if (!n || n <= 0) return;
-                    onSubmit({ amount: n, note });
+                    onSubmit({ amount: n, note, method });
                   }}
                   disabled={Boolean(busy) || !amount.trim()}
                   className={cn(

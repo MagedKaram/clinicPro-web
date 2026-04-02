@@ -254,7 +254,7 @@ export function ReceptionClient({
   }, [billingBusy]);
 
   const submitPayment = useCallback(
-    async (payload: { amount: number; note: string }) => {
+    async (payload: { amount: number; note: string; method: import("@/types/clinic").PaymentMethod }) => {
       if (!billingData) {
         window.alert(t("billing.loading"));
         return;
@@ -272,6 +272,7 @@ export function ReceptionClient({
           visitId: billingData.visitId,
           amount: payload.amount,
           note: payload.note,
+          paymentMethod: payload.method,
         });
         setBillingData(next);
         await Promise.all([refreshBalance(), refreshReport(), refreshQueue()]);
@@ -291,6 +292,7 @@ export function ReceptionClient({
     patientId?: string;
     name: string;
     phone?: string;
+    nationalId?: string;
     address?: string;
     visitType: VisitType;
   }): Promise<{ ticket: number; time: string; waitingAhead: number }> {
@@ -311,6 +313,7 @@ export function ReceptionClient({
         patientId: payload.patientId,
         name: payload.name,
         phone: payload.phone,
+        nationalId: payload.nationalId,
         address: payload.address,
         visitType: payload.visitType,
         price:
@@ -360,8 +363,12 @@ export function ReceptionClient({
         ];
       });
 
-      // Background refresh to keep numbers perfect.
-      void Promise.all([refreshQueue(), refreshBalance()]);
+      // Refresh balance immediately (safe — no optimistic conflict).
+      // Delay queue refresh: realtime subscription will fire for the new visit
+      // and reconcile. An immediate refresh risks overwriting the optimistic
+      // state if the DB query returns empty (e.g. RLS not yet warm).
+      void refreshBalance();
+      window.setTimeout(() => void refreshQueue(), 1500);
 
       return { ticket: res.ticket, time, waitingAhead: res.waitingAhead };
     } finally {
@@ -423,6 +430,7 @@ export function ReceptionClient({
             settings={settings}
             onSave={saveSettings}
             busy={busy}
+            clinicId={clinicId}
           />
         )}
       </main>

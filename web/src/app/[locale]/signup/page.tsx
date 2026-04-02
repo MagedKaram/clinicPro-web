@@ -6,11 +6,16 @@ export const dynamic = "force-dynamic";
 
 export default async function SignupPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams?: Promise<{ mode?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <SignupClient />;
+  const resolved = await searchParams;
+  const isClinicOnly = resolved?.mode === "clinic-only";
+
+  return <SignupClient isClinicOnly={isClinicOnly} />;
 }

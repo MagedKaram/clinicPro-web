@@ -50,6 +50,11 @@
   --dis-border: color-mix(in srgb, var(--dis-text) 8%, transparent);
   --dis-topbar: color-mix(in srgb, black 30%, transparent);
 
+  /* Landing / Marketing tokens */
+  --land-teal: #00c9b1;
+  --land-sky: #0ea5e9;
+  --land-dark: #0f172a;
+
   /* Doctor theme tokens (UI Phase) */
   --doc-bg: #0d1f33;
   --doc-card: #132840;
@@ -101,6 +106,10 @@
   --color-dis-border: var(--dis-border);
   --color-dis-topbar: var(--dis-topbar);
 
+  --color-land-teal: var(--land-teal);
+  --color-land-sky: var(--land-sky);
+  --color-land-dark: var(--land-dark);
+
   --color-doc-bg: var(--doc-bg);
   --color-doc-card: var(--doc-card);
   --color-doc-card-2: var(--doc-card-2);
@@ -111,6 +120,32 @@
   --color-doc-accent-2: var(--doc-accent-2);
   --color-doc-new: var(--doc-new);
   --color-doc-followup: var(--doc-followup);
+}
+
+@utility bg-brand-gradient {
+  background: linear-gradient(135deg, var(--land-teal), var(--land-sky));
+}
+
+@utility text-brand-gradient {
+  background: linear-gradient(135deg, var(--land-teal), var(--land-sky));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@utility animate-fade-in {
+  animation: fade-in 0.6s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @utility shadow-rec {

@@ -6,5 +6,5 @@ export default async function BuyPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  redirect(`/${locale}/signup`);
+  redirect(`/${locale}/pricing`);
 }

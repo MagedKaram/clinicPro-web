@@ -10,12 +10,67 @@ function dayLabel(locale: string, dayISO: string): string {
   }).format(d);
 }
 
-export function AdminBarChart({
+export function AdminLineChart({
   locale,
   data,
 }: {
   locale: string;
   data: Array<{ day: string; value: number }>;
+}) {
+  const W = 300;
+  const H = 60;
+  const max =
+    data.reduce((m, d) => Math.max(m, Number(d.value ?? 0)), 0) || 1;
+
+  const pts = data
+    .map((d, i) => {
+      const x = (i / Math.max(data.length - 1, 1)) * W;
+      const y = H - (Math.max(0, Number(d.value ?? 0)) / max) * H;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+
+  const first = data[0];
+  const last = data[data.length - 1];
+
+  return (
+    <div className="mt-3">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="w-full h-20"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        {data.length > 1 && (
+          <polyline
+            fill="none"
+            stroke="currentColor"
+            className="text-rec-primary"
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            points={pts}
+          />
+        )}
+      </svg>
+      {first && last ? (
+        <div className="flex justify-between text-[0.72rem] text-rec-muted">
+          <span>{dayLabel(locale, first.day)}</span>
+          <span>{dayLabel(locale, last.day)}</span>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export function AdminBarChart({
+  locale,
+  data,
+  rawLabels,
+}: {
+  locale: string;
+  data: Array<{ day: string; value: number }>;
+  rawLabels?: boolean;
 }) {
   const values = data.map((d) => Number(d.value ?? 0));
   const max = values.reduce((m, v) => (v > m ? v : m), 0) || 1;
@@ -26,6 +81,7 @@ export function AdminBarChart({
         {data.map((d) => {
           const raw = Number(d.value ?? 0);
           const pct = clamp((raw / max) * 100, 0, 100);
+          const label = rawLabels ? d.day : dayLabel(locale, d.day);
           return (
             <div key={d.day} className="flex flex-1 flex-col gap-2">
               <div
@@ -33,8 +89,8 @@ export function AdminBarChart({
                 style={{ height: `${pct}%` }}
                 aria-label={`${d.day}: ${raw}`}
               />
-              <div className="text-[0.72rem] text-rec-muted text-center">
-                {dayLabel(locale, d.day)}
+              <div className="text-[0.72rem] text-rec-muted text-center truncate">
+                {label}
               </div>
             </div>
           );

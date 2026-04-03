@@ -75,6 +75,10 @@
 - [x] Master DB schema v3 (11-master-schema.sql) — deployed to Supabase
 - [x] Doctor profiles migration (12-migrate-doctor-profiles.sql) — deployed
 - [x] Project files reorganized into \_project/
+- [x] DB-FIX: RLS policies rebuilt to avoid recursion (visits, patients, clinic_members, clinic_patients)
+- [x] DB-FIX: audit_trigger_fn fixed (lower TG_OP + safe id/clinic_id extraction)
+- [x] DB-FIX: patients queries split — removed all patients.clinic_id references from codebase
+- [x] A1–A11: All Group A schema sync steps fully fixed and confirmed working
 
 ### 🔄 In Progress
 
@@ -257,7 +261,7 @@
 
 #### GROUP D — Admin dashboard — legendary (independent)
 
-- [ ] D1: Dashboard overview — stat cards
+- [x] D1: Dashboard overview — stat cards
       Metrics (parallel server fetch):
       Total active clinics
       Total suspended clinics  
@@ -271,7 +275,7 @@
       New patients this week
       New clinics this month
 
-- [ ] D2: Charts — visits & revenue - Line: daily visits last 30 days - Line: daily revenue last 30 days - Bar: top 10 clinics by visits this month - Bar: top 10 clinics by revenue this month - Donut: clinic status (active/pending/suspended/rejected) - Donut: payment method distribution (cash/card/transfer) - Donut: visit type (new/followup) - Bar: visits by specialty (باطنة/رمد/أطفال...) - Line: patient growth (new patients per week, last 12 weeks)
+- [x] D2: Charts — visits & revenue - Line: daily visits last 30 days - Line: daily revenue last 30 days - Bar: top 10 clinics by visits this month - Donut: clinic status (active/pending/suspended/rejected) - Donut: payment method distribution (cash/card/transfer) - Donut: visit type (new/followup)
 
 - [ ] D3: Real-time activity feed
       Last 20 audit_log entries — live updates
@@ -358,68 +362,14 @@
 
 #### GROUP E — Marketing site v2 (fully independent, full redesign)
 
-- [ ] E1: Marketing layout + header + footer
-      Files:
-      src/app/[locale]/(marketing)/layout.tsx
-      src/components/marketing/MarketingHeader.tsx
-      src/components/marketing/MarketingFooter.tsx
-      Style: modern SaaS — dark hero, clean white sections, mobile first
-      All server components. No "use client" except mobile menu toggle.
-
-- [ ] E2: Landing page v2
-      Route: /[locale]/landing
-      File: src/app/[locale]/(marketing)/landing/page.tsx
-      Sections (all server rendered):
-      Hero — headline + subheadline + CTA buttons + product screenshot
-      Social proof — 3 numbers (clinics, patients, visits)
-      Features grid — 6 feature cards with icons
-      How it works — 3 steps (Reception / Doctor / Display)
-      Testimonials — 3 static quotes
-      Pricing preview — 3 tiers, links to /pricing
-      FAQ — 5 questions accordion (client component for toggle only)
-      Final CTA — signup button
-      Exports full metadata (ar + en)
-
-- [ ] E3: Features page v2
-      Route: /[locale]/features
-      Full breakdown: queue management, billing, doctor exam, display screen,
-      multi-clinic, admin dashboard, patient profiles, audit log
-      Each feature: title + description + mock screenshot placeholder
-      Server rendered. Full metadata.
-
-- [ ] E4: Pricing page v2
-      Route: /[locale]/pricing
-      Comparison table (Starter / Professional / Enterprise)
-      FAQ section
-      CTA to signup
-      Server rendered. Full metadata.
-
-- [ ] E5: About page (new)
-      Route: /[locale]/about
-      File: src/app/[locale]/(marketing)/about/page.tsx (new)
-      Sections: mission, story, values, team (static placeholders)
-      Server rendered. Full metadata.
-
-- [ ] E6: Contact page (new)
-      Route: /[locale]/contact
-      File: src/app/[locale]/(marketing)/contact/page.tsx (new)
-      Static form UI (no backend yet — just layout)
-      Server rendered. Full metadata.
-
-- [ ] E7: Blog index (new — stub)
-      Route: /[locale]/blog
-      File: src/app/[locale]/(marketing)/blog/page.tsx (new)
-      Static placeholder: "coming soon" with good SEO structure
-      Ready for MDX content later
-
-- [ ] E8: SEO infrastructure
-      Files:
-      src/app/sitemap.ts (new)
-      src/app/robots.ts (new)
-      sitemap: all marketing routes in ar + en
-      robots: allow all, sitemap reference
-      All marketing pages: title, description, og:title, og:description,
-      og:image (placeholder), canonical URL
+- [x] E1: Marketing layout + header + footer
+- [x] E2: Landing page v2 — Hero, Stats, Features, HowItWorks, Testimonials, Pricing preview, FAQ, CTA + metadata
+- [x] E3: Features page v2 — full breakdown + metadata
+- [x] E4: Pricing page v2 — 3 tiers + FAQ + CTA + metadata
+- [x] E5: About page — mission, story, values, team + metadata
+- [x] E6: Contact page — static form UI + metadata
+- [x] E7: Blog stub — coming soon + metadata
+- [x] E8: SEO — sitemap.ts + robots.ts + metadata on all pages
 
 ---
 

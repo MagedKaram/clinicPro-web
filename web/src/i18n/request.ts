@@ -1,11 +1,10 @@
 import { getRequestConfig } from "next-intl/server";
 import { defaultLocale, isAppLocale } from "@/i18n/routing";
 
-export default getRequestConfig(async ({ locale }) => {
-  const candidateLocale = locale ?? defaultLocale;
-  const resolvedLocale = isAppLocale(candidateLocale)
-    ? candidateLocale
-    : defaultLocale;
+export default getRequestConfig(async ({ requestLocale }) => {
+  const requested = await requestLocale;
+  const resolvedLocale =
+    requested && isAppLocale(requested) ? requested : defaultLocale;
 
   return {
     locale: resolvedLocale,

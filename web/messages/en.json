@@ -426,108 +426,79 @@
       "mismatch": "Passwords do not match"
     }
   },
-  "landing": {
-    "nav": {
-      "features": "Features",
-      "howItWorks": "How it works",
-      "pricing": "Pricing",
-      "login": "Login",
-      "signup": "Sign Up"
+  "about": {
+    "title": "About Clinic Queue",
+    "subtitle": "Our mission is to modernize healthcare management across the Arab world",
+    "meta": {
+      "title": "About — Clinic Queue",
+      "description": "Learn about Clinic Queue's story and our vision to improve clinic and patient experiences."
     },
-    "hero": {
-      "title": "Smart Clinic Management",
-      "subtitle": "Streamline your clinic with our smart queue and management system. Say goodbye to messy waiting rooms and hello to seamless operations.",
-      "ctaPrimary": "Get Started Now",
-      "ctaSecondary": "View Features"
-    },
-    "features": {
-      "title": "Why Choose Clinic Queue?",
-      "subtitle": "Everything you need to run your clinic smoothly",
-      "items": {
-        "queue": {
-          "title": "Smart Queue Management",
-          "desc": "Efficiently manage patient queues with real-time displays and ticketing."
-        },
-        "multiClinic": {
-          "title": "Multi-Clinic Support",
-          "desc": "Manage multiple clinics and doctors seamlessly under one account."
-        },
-        "doctor": {
-          "title": "Doctor Dashboard",
-          "desc": "Dedicated view for doctors to see patient history, add notes, and call the next patient."
-        },
-        "billing": {
-          "title": "Integrated Billing",
-          "desc": "Keep track of visit fees, payments, and patient balances with ease."
-        }
-      }
-    },
-    "howItWorks": {
-      "title": "How It Works",
-      "subtitle": "Get up and running in minutes",
-      "steps": {
-        "1": {
-          "title": "Create Account",
-          "desc": "Sign up and create your clinic workspace."
-        },
-        "2": {
-          "title": "Add Details",
-          "desc": "Configure your clinic name, doctor, and pricing."
-        },
-        "3": {
-          "title": "Start Serving",
-          "desc": "Register patients and manage your queue immediately."
-        }
-      }
-    },
-    "pricing": {
-      "title": "Simple & Transparent Pricing",
-      "subtitle": "No hidden fees, cancel anytime. Pay only for what you need.",
-      "plans": {
-        "basic": {
-          "name": "Starter",
-          "price": "Free",
-          "period": "forever",
-          "desc": "Perfect for trying out the system.",
-          "features": [
-            "Up to 50 patients/day",
-            "1 Clinic",
-            "Basic Queue Management",
-            "Email Support"
-          ]
-        },
-        "pro": {
-          "name": "Professional",
-          "price": "99",
-          "period": "EGP / month",
-          "desc": "For busy clinics needing full features.",
-          "features": [
-            "Unlimited patients",
-            "Up to 5 clinics",
-            "Advanced Reporting",
-            "Priority Email Support"
-          ]
-        },
-        "enterprise": {
-          "name": "Enterprise",
-          "price": "Custom",
-          "period": "contact us",
-          "desc": "For large networks with dedicated support.",
-          "features": [
-            "Unlimited everything",
-            "Unlimited clinics",
-            "Custom integrations",
-            "24/7 Phone & Email Support",
-            "Dedicated Account Manager"
-          ]
+    "sections": {
+      "mission": {
+        "title": "Our Mission",
+        "body": "We strive to empower every clinic — large or small — to deliver a seamless waiting experience for patients and high efficiency for medical teams."
+      },
+      "story": {
+        "title": "Our Story",
+        "body": "We started from a simple observation: most clinics struggle with waiting room chaos. So we built a simple system to solve this problem with modern technology."
+      },
+      "values": {
+        "title": "Our Values",
+        "items": {
+          "transparency": {
+            "title": "Transparency",
+            "desc": "Clear pricing and honest data at every step."
+          },
+          "innovation": {
+            "title": "Innovation",
+            "desc": "We continuously evolve to meet the needs of modern clinics."
+          },
+          "care": {
+            "title": "Care",
+            "desc": "We put the doctor and patient experience at the heart of every decision."
+          }
         }
       },
-      "cta": "Get Started"
+      "team": {
+        "title": "Our Team",
+        "members": [
+          {
+            "name": "Ahmed",
+            "role": "Founder & Developer"
+          },
+          {
+            "name": "Mariam",
+            "role": "UX/UI Designer"
+          },
+          {
+            "name": "Khaled",
+            "role": "Backend Engineer"
+          }
+        ]
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We'd love to hear your questions and feedback",
+    "meta": {
+      "title": "Contact — Clinic Queue",
+      "description": "Get in touch with the Clinic Queue team for any inquiries or support."
     },
-    "footer": {
-      "rights": "© 2024 Clinic Queue. All rights reserved.",
-      "company": "Clinic Queue",
-      "tagline": "Modernizing healthcare management."
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "message": "Message",
+      "submit": "Send Message"
+    }
+  },
+  "blog": {
+    "title": "Clinic Queue Blog",
+    "subtitle": "Articles and tips on clinic management and healthcare",
+    "comingSoon": "Coming soon — stay tuned!",
+    "meta": {
+      "title": "Blog — Clinic Queue",
+      "description": "Articles and tips on clinic management and digital healthcare."
     }
   },
   "clinicStatus": {
@@ -565,20 +536,39 @@
       "cards": {
         "clinicsTotal": "Total clinics",
         "clinicsActive": "Active clinics",
-        "pendingClinics": "Pending requests",
+        "clinicsPending": "Pending requests",
+        "clinicsSuspended": "Suspended clinics",
         "doctors": "Doctors",
         "patients": "Patients",
-        "visitsToday": "Visits today"
+        "newPatientsThisWeek": "new patients this week",
+        "newClinicsThisMonth": "new clinics this month",
+        "visitsToday": "Visits today",
+        "visitsThisMonth": "visits this month",
+        "revenueToday": "Revenue today",
+        "revenueThisMonth": "this month"
       },
       "charts": {
-        "visits7d": "Visits (last 7 days)",
-        "payments7d": "Payments (last 7 days)",
-        "clinicStatus": "Clinic status"
+        "visits30d": "Visits (last 30 days)",
+        "revenue30d": "Revenue (last 30 days)",
+        "topClinics": "Top clinics by visits",
+        "clinicStatus": "Clinic status",
+        "paymentMethods": "Payment methods",
+        "visitTypes": "Visit types"
       },
       "status": {
         "active": "Active",
         "pending": "Pending",
-        "rejected": "Rejected"
+        "rejected": "Rejected",
+        "suspended": "Suspended"
+      },
+      "paymentMethod": {
+        "cash": "Cash",
+        "card": "Card",
+        "transfer": "Transfer"
+      },
+      "visitType": {
+        "new": "New",
+        "followup": "Follow-up"
       }
     },
     "approvals": {
@@ -729,5 +719,271 @@
         "dependents": "No dependents."
       }
     }
+  },
+  "nav": {
+    "logo": "Clinic Queue",
+    "features": "Features",
+    "pricing": "Pricing",
+    "about": "About",
+    "login": "Login",
+    "signup": "Get started",
+    "close": "Close menu",
+    "langAr": "عربي",
+    "langEn": "EN"
+  },
+  "hero": {
+    "badge": "Queue Management System",
+    "headline1": "Smart",
+    "headline2": "Clinic",
+    "headline3": "Queues",
+    "subheadline": "Streamline patient flow from reception to diagnosis. Real-time, bilingual, built for Egyptian clinics.",
+    "ctaPrimary": "Start for free",
+    "ctaSecondary": "See how it works",
+    "mockupTitle": "Today's Queue",
+    "mockupServing": "Now serving",
+    "mockupTicket": "Ticket",
+    "mockupWaiting": "waiting",
+    "mockupName1": "Ahmed Mohamed",
+    "mockupName2": "Sara Khaled",
+    "mockupName3": "Mahmoud Ali"
+  },
+  "proof": {
+    "clinicsLabel": "Clinics",
+    "patientsLabel": "Patients",
+    "visitsLabel": "Visits",
+    "clinicsCount": "500",
+    "patientsCount": "50000",
+    "visitsCount": "1000000",
+    "clinicsDisplay": "+500",
+    "patientsDisplay": "+50,000",
+    "visitsDisplay": "+1,000,000"
+  },
+  "features": {
+    "title": "Everything your clinic needs",
+    "subtitle": "Built from the ground up for modern clinics",
+    "queue": { "title": "Queue Management", "desc": "Real-time patient queue with automatic ticket assignment and live updates" },
+    "billing": { "title": "Smart Billing", "desc": "Track payments, discounts, and daily balance across all visit types" },
+    "doctor": { "title": "Doctor Dashboard", "desc": "Diagnosis, prescriptions, vital signs — all in one streamlined exam view" },
+    "display": { "title": "Display Screen", "desc": "Real-time waiting room display with animated ticket numbers and patient names" },
+    "profiles": { "title": "Patient Profiles", "desc": "Full medical history, allergies, chronic diseases and guardian links" },
+    "admin": { "title": "Admin Control", "desc": "Multi-clinic oversight, pending approvals, and a full analytics dashboard" }
+  },
+  "how": {
+    "title": "How it works",
+    "subtitle": "Three roles, one seamless workflow",
+    "step1Title": "Reception",
+    "step1Desc": "Registers the patient and issues a numbered ticket",
+    "step2Title": "Doctor",
+    "step2Desc": "Calls next patient, examines and writes the diagnosis",
+    "step3Title": "Display",
+    "step3Desc": "Shows ticket numbers live to patients in the waiting room",
+    "step1Num": "01",
+    "step2Num": "02",
+    "step3Num": "03"
+  },
+  "testimonials": {
+    "title": "Trusted by doctors",
+    "subtitle": "Real feedback from clinics using the system",
+    "q1Quote": "The system completely transformed how my clinic operates",
+    "q1Name": "Dr. Ahmed",
+    "q1Specialty": "Internal Medicine",
+    "q2Quote": "Billing became so much faster and more accurate",
+    "q2Name": "Dr. Sara",
+    "q2Specialty": "Pediatrics",
+    "q3Quote": "Patients really love the waiting room display screen",
+    "q3Name": "Dr. Mohamed",
+    "q3Specialty": "Ophthalmology"
+  },
+  "pricing": {
+    "title": "Simple, transparent pricing",
+    "subtitle": "No hidden fees. No long-term contracts.",
+    "popular": "Most Popular",
+    "currency": "EGP",
+    "period": "/month",
+    "starterName": "Starter",
+    "starterPrice": "Free",
+    "starterDesc": "For new clinics just getting started",
+    "starterCta": "Get started",
+    "proName": "Professional",
+    "proPrice": "299",
+    "proDesc": "Everything you need to run a modern clinic",
+    "proCta": "Start free trial",
+    "enterpriseName": "Enterprise",
+    "enterprisePrice": "Contact us",
+    "enterpriseDesc": "For clinic chains and large practices",
+    "enterpriseCta": "Talk to sales",
+    "viewAll": "View all plan details →"
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "q1Q": "How do I start using the system?",
+    "q1A": "Sign up, register your clinic details, and you can start managing patients immediately after admin approval — usually within 24 hours.",
+    "q2Q": "Is my data secure?",
+    "q2A": "Yes. All data is encrypted in transit and at rest. We use row-level security so each clinic can only ever access its own data.",
+    "q3Q": "Does it support multiple doctors?",
+    "q3A": "Absolutely. You can add multiple team members with different roles — reception staff or doctors — each with scoped access.",
+    "q4Q": "What payment methods are supported?",
+    "q4A": "Cash, card, and bank transfer — all tracked separately with per-method totals in the daily report.",
+    "q5Q": "Is technical support available?",
+    "q5A": "Yes, we offer support via email and WhatsApp during business hours, plus full documentation."
+  },
+  "cta": {
+    "headline": "Ready to transform your clinic?",
+    "subtext": "Join hundreds of clinics already running on Clinic Queue",
+    "button": "Start for free today"
+  },
+  "footer": {
+    "logo": "Clinic Queue",
+    "tagline": "Smart queue management for modern clinics",
+    "productCol": "Product",
+    "companyCol": "Company",
+    "legalCol": "Legal",
+    "featuresLink": "Features",
+    "pricingLink": "Pricing",
+    "dashboardLink": "Dashboard",
+    "aboutLink": "About",
+    "contactLink": "Contact",
+    "blogLink": "Blog",
+    "privacyLink": "Privacy Policy",
+    "termsLink": "Terms of Service",
+    "copyright": "© 2026 Clinic Queue. All rights reserved."
+  },
+  "featuresPage": {
+    "heroTitle": "All Features",
+    "heroSubtitle": "Every tool you need to run a smooth, modern clinic",
+    "visualPlaceholder": "Visual",
+    "queueTitle": "Queue Management",
+    "queueDesc": "Manage patient flow in real time with automatic ticket assignment, live status updates, and a dedicated display screen for the waiting room.",
+    "queueP1": "Automatic ticket numbering for new and follow-up visits",
+    "queueP2": "Live queue status visible to reception and doctor simultaneously",
+    "queueP3": "One-click call-next from the doctor's dashboard",
+    "billingTitle": "Smart Billing",
+    "billingDesc": "Track every payment, discount, and outstanding balance without leaving the registration screen.",
+    "billingP1": "Supports cash, card, and bank transfer",
+    "billingP2": "Per-visit and daily balance reports",
+    "billingP3": "Discount tracking and payment status per visit",
+    "doctorTitle": "Doctor Dashboard",
+    "doctorDesc": "Everything the doctor needs in one focused view — from vital signs to final diagnosis.",
+    "doctorP1": "Vital signs: weight, height, BP, pulse, temperature, blood sugar",
+    "doctorP2": "Diagnosis, prescription, and visit notes",
+    "doctorP3": "Full patient medical history at a glance",
+    "displayTitle": "Display Screen",
+    "displayDesc": "A dedicated full-screen view for the waiting room, showing ticket numbers with live animations.",
+    "displayP1": "Real-time updates via Supabase Realtime",
+    "displayP2": "Dark animated theme visible across the room",
+    "displayP3": "Arabic and English ticket announcements",
+    "profilesTitle": "Patient Profiles",
+    "profilesDesc": "A complete medical record for every patient, shared securely across clinics.",
+    "profilesP1": "Chronic diseases, allergies, and current medications",
+    "profilesP2": "Past surgeries and family history",
+    "profilesP3": "Guardian links for pediatric patients",
+    "multiTitle": "Multi-Clinic Support",
+    "multiDesc": "Manage multiple clinic branches from a single admin account.",
+    "multiP1": "Each clinic has its own isolated data and team",
+    "multiP2": "Centralized admin dashboard across all clinics",
+    "multiP3": "Role-based access: owner, doctor, reception",
+    "adminTitle": "Admin Dashboard",
+    "adminDesc": "Platform-level oversight with full analytics, approvals, and audit logs.",
+    "adminP1": "Approve or reject clinic registrations",
+    "adminP2": "Revenue and visit charts across all clinics",
+    "adminP3": "Full audit log of every data change",
+    "auditTitle": "Audit & Security",
+    "auditDesc": "Every action is logged and traceable. Your data never leaves our secure infrastructure.",
+    "auditP1": "Row-level security enforced by Supabase",
+    "auditP2": "Full audit trail: who changed what, when",
+    "auditP3": "End-to-end encryption in transit and at rest",
+    "metaTitle": "Features — Clinic Queue",
+    "metaDesc": "Explore all features: queue management, billing, doctor dashboard, patient profiles, multi-clinic support, and more."
+  },
+  "pricingPage": {
+    "heroTitle": "Pricing",
+    "heroSubtitle": "Straightforward plans that grow with your clinic",
+    "tableTitle": "Compare plans",
+    "featureQueue": "Queue management",
+    "featureBilling": "Billing & payments",
+    "featureDoctor": "Doctor dashboard",
+    "featureDisplay": "Display screen",
+    "featureProfiles": "Patient profiles",
+    "featureReports": "Daily reports",
+    "featureMultiDoctor": "Multiple doctors",
+    "featureAdmin": "Admin dashboard",
+    "featureAudit": "Audit logs",
+    "featureSupport": "Priority support",
+    "checkYes": "Yes",
+    "checkNo": "No",
+    "faqTitle": "Pricing FAQ",
+    "faqQ1": "Is there a free trial?",
+    "faqA1": "The Starter plan is permanently free. Professional includes a 14-day free trial.",
+    "faqQ2": "Can I change plans later?",
+    "faqA2": "Yes, upgrade or downgrade at any time. Changes take effect on your next billing cycle.",
+    "faqQ3": "What is the billing currency?",
+    "faqA3": "All prices are in Egyptian Pounds (EGP).",
+    "faqQ4": "Is there a setup fee?",
+    "faqA4": "No setup fees ever. Pay only the monthly subscription.",
+    "metaTitle": "Pricing — Clinic Queue",
+    "metaDesc": "Simple, transparent pricing for clinic queue management. Free plan available."
+  },
+  "about": {
+    "heroTitle": "About Clinic Queue",
+    "heroSubtitle": "We are building the operating system for Egyptian clinics",
+    "missionTitle": "Our Mission",
+    "missionText": "To eliminate the chaos of paper-based queues and disconnected billing systems in Egyptian clinics — giving doctors more time to care and patients a better experience.",
+    "storyTitle": "Our Story",
+    "storyText": "Clinic Queue started as a simple Flask app built to solve a real problem in a single clinic. After seeing how much time was wasted on manual queues and hand-written billing, we rebuilt it as a modern SaaS platform that any clinic in Egypt can adopt in minutes.",
+    "value1Title": "Simplicity first",
+    "value1Desc": "Every feature is designed to reduce clicks, not add them.",
+    "value2Title": "Built for Egypt",
+    "value2Desc": "Full Arabic support, EGP billing, and local clinic workflows.",
+    "value3Title": "Secure by default",
+    "value3Desc": "Row-level security and encryption protect every record.",
+    "value4Title": "Always improving",
+    "value4Desc": "We ship updates based on real clinic feedback every week.",
+    "valuesTitle": "Our values",
+    "teamTitle": "The team",
+    "teamSubtitle": "A small team with a big focus on clinic operations",
+    "teamMemberPlaceholder": "Team Member",
+    "teamRolePlaceholder": "Role",
+    "metaTitle": "About — Clinic Queue",
+    "metaDesc": "Learn about Clinic Queue — our mission, story, and values."
+  },
+  "contact": {
+    "heroTitle": "Contact us",
+    "heroSubtitle": "We'd love to hear from you. Reach out any time.",
+    "formTitle": "Send a message",
+    "nameLabel": "Full name",
+    "namePlaceholder": "Dr. Ahmed",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@clinic.com",
+    "subjectLabel": "Subject",
+    "subjectPlaceholder": "Question about pricing",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Tell us how we can help...",
+    "submitButton": "Send message",
+    "infoTitle": "Other ways to reach us",
+    "emailInfo": "support@clinicqueue.io",
+    "whatsappInfo": "WhatsApp support",
+    "hoursInfo": "Sun–Thu, 9am–6pm EGT",
+    "metaTitle": "Contact — Clinic Queue",
+    "metaDesc": "Contact Clinic Queue support — email, WhatsApp, or the contact form."
+  },
+  "blog": {
+    "heroTitle": "Blog",
+    "heroSubtitle": "Insights, updates, and clinic management tips",
+    "comingSoon": "Coming soon",
+    "comingSoonDesc": "We are working on our first articles. Sign up below to get notified when we publish.",
+    "notifyLabel": "Get notified",
+    "emailPlaceholder": "your@email.com",
+    "notifyButton": "Notify me",
+    "metaTitle": "Blog — Clinic Queue",
+    "metaDesc": "Clinic Queue blog — tips, updates, and insights on clinic management."
+  },
+  "notFound": {
+    "code": "404",
+    "headline": "Page Not Found",
+    "subtext": "The page you're looking for doesn't exist or has been moved",
+    "backHome": "Back to Home"
+  },
+  "loading": {
+    "text": "Loading..."
   }
 }

@@ -211,20 +211,39 @@ export default async function AdminPage({
               cards: {
                 clinicsTotal: t("dashboard.cards.clinicsTotal"),
                 clinicsActive: t("dashboard.cards.clinicsActive"),
+                clinicsPending: t("dashboard.cards.clinicsPending"),
+                clinicsSuspended: t("dashboard.cards.clinicsSuspended"),
                 doctors: t("dashboard.cards.doctors"),
                 patients: t("dashboard.cards.patients"),
+                newPatientsThisWeek: t("dashboard.cards.newPatientsThisWeek"),
+                newClinicsThisMonth: t("dashboard.cards.newClinicsThisMonth"),
                 visitsToday: t("dashboard.cards.visitsToday"),
-                pendingClinics: t("dashboard.cards.pendingClinics"),
+                visitsThisMonth: t("dashboard.cards.visitsThisMonth"),
+                revenueToday: t("dashboard.cards.revenueToday"),
+                revenueThisMonth: t("dashboard.cards.revenueThisMonth"),
               },
               charts: {
-                visits7d: t("dashboard.charts.visits7d"),
-                payments7d: t("dashboard.charts.payments7d"),
+                visits30d: t("dashboard.charts.visits30d"),
+                revenue30d: t("dashboard.charts.revenue30d"),
+                topClinics: t("dashboard.charts.topClinics"),
                 clinicStatus: t("dashboard.charts.clinicStatus"),
+                paymentMethods: t("dashboard.charts.paymentMethods"),
+                visitTypes: t("dashboard.charts.visitTypes"),
               },
               status: {
                 active: t("dashboard.status.active"),
                 pending: t("dashboard.status.pending"),
                 rejected: t("dashboard.status.rejected"),
+                suspended: t("dashboard.status.suspended"),
+              },
+              paymentMethod: {
+                cash: t("dashboard.paymentMethod.cash"),
+                card: t("dashboard.paymentMethod.card"),
+                transfer: t("dashboard.paymentMethod.transfer"),
+              },
+              visitType: {
+                new: t("dashboard.visitType.new"),
+                followup: t("dashboard.visitType.followup"),
               },
             }}
           />

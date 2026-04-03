@@ -152,3 +152,31 @@
 ✅ BF3 — Re-application flow: clinic-status shows "إعادة التقديم" for rejected clinics → /signup?mode=clinic-only; email-exists error shows inline login link — 2026-04-02
 
 ✅ BF2-fix — doctor_profiles now saves correctly (required, not best-effort) + avatar_url field added; avatar upload in signup Step 3 + DoctorProfileSection; avatar shown in admin doctors list + detail pages — 2026-04-02
+
+## DB-FIX — Schema sync + RLS fixes (2026-04-02)
+
+✅ DB-FIX — RLS recursion fixed on visits/patients/clinic_members/clinic_patients: all policies rebuilt with direct clinic_members JOIN instead of is_clinic_member() helper — 2026-04-02
+✅ DB-FIX — audit_trigger_fn fixed: lower(TG_OP) for correct audit_action cast; safe id/clinic_id extraction with EXCEPTION WHEN undefined_column — 2026-04-02
+✅ DB-FIX — All patients.clinic_id references removed from codebase: reports.ts + getVisitBilling.ts patched; documented in docs/13-rls-fixes.sql — 2026-04-02
+✅ CORE — Reception queue working correctly after full schema sync — 2026-04-02
+
+## Group D — Admin Dashboard (2026-04-02)
+
+✅ D1 — Dashboard stat cards: 2 rows of 4 cards (clinic counts, activity metrics, revenue); metrics.ts fetches all 11 metrics in parallel — 2026-04-02
+✅ D2 — Charts: 30-day visits line chart, 30-day revenue line chart, top-5 clinics bar chart, clinic status donut, payment methods donut, visit types donut — 2026-04-02
+
+## Group E — Marketing site v2 (2026-04-02)
+
+✅ E1 — New marketing layout + MarketingHeader (server + MobileMenuClient) + MarketingFooter (dark land-dark bg) in src/components/marketing/ — 2026-04-02
+✅ E2 — Landing page v2: Hero, Stats, Features (6 cards), HowItWorks, Testimonials, PricingPreview, FAQAccordion (client), CTA — all server except FAQ toggle; full metadata — 2026-04-02
+✅ E3 — Features page v2: 8 feature cards, server rendered, full metadata — 2026-04-02
+✅ E4 — Pricing page v2: 3 tiers + FAQ + CTA, server rendered, full metadata — 2026-04-02
+✅ E5 — About page: mission/story/values/team, server rendered, full metadata — 2026-04-02
+✅ E6 — Contact page: static form UI, server rendered, full metadata — 2026-04-02
+✅ E7 — Blog stub: coming soon, server rendered, full metadata — 2026-04-02
+✅ E8 — SEO: sitemap.ts + robots.ts; all marketing pages export generateMetadata — 2026-04-02
+
+## Group E — Full redesign v2 (2026-04-03)
+
+✅ E-REDESIGN-v1 — Premium dark-navy SaaS redesign using doc-* tokens: MarketingNav (client, scroll-hide + mobile hamburger), HeroSection (framer-motion word stagger + mockup card), SocialProofBar (count-up animation), FeaturesGrid (6 cards + inline SVGs + scroll stagger), HowItWorksSection (server, 3 steps), TestimonialsSection (server), PricingPreview (server, 3 tiers, pro highlighted), FAQAccordion (client, AnimatePresence), CTASection (server), MarketingFooter (server). All pages updated: landing, features, pricing, about, contact, blog. Build: 48 pages, 0 errors. — 2026-04-02
+✅ E-REDESIGN-v2 — Full rebuild from scratch (2026-04-03): deleted old landing components, rebuilt all 10 components in src/components/marketing/ using ONLY doc-* CSS tokens, full i18n (nav/hero/proof/features/how/testimonials/pricing/faq/cta/footer/featuresPage/pricingPage/about/contact/blog in both AR+EN), marketing layout.tsx recreated, /audit P0+P1 fixes applied (explicit TS keys, badge centering fix, buy→pricing redirect). Build: 48 static pages, 0 errors, 0 warnings. — 2026-04-03

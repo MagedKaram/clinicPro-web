@@ -228,7 +228,7 @@ export function RegistrationCard({
 
           <div
             className={cn(
-              "absolute top-full left-0 right-0 mt-1 bg-rec-card border-2 border-rec-border rounded-xl shadow-rec z-50 max-h-56 overflow-y-auto",
+              "absolute top-full inset-x-0 mt-1 bg-rec-card border-2 border-rec-border rounded-xl shadow-rec z-50 max-h-56 overflow-y-auto",
               isSearchOpen && results.length ? "block" : "hidden",
             )}
           >
@@ -238,13 +238,13 @@ export function RegistrationCard({
                 key={p.id}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => selectPatient(p)}
-                className="w-full text-right px-3.5 py-2.5 border-b border-rec-border last:border-b-0 hover:bg-rec-soft-primary transition-colors flex items-center gap-2"
+                className="w-full text-start px-3.5 py-2.5 border-b border-rec-border last:border-b-0 hover:bg-rec-soft-primary transition-colors flex items-center gap-2"
               >
                 <div className="font-bold text-[0.9rem]">{p.name}</div>
                 <div className="text-[0.76rem] text-rec-muted">
                   {p.phone ?? ""}
                 </div>
-                <span className="mr-auto text-[0.7rem] px-2 py-0.5 rounded-full bg-rec-soft-primary text-rec-primary font-bold">
+                <span className="me-auto text-[0.7rem] px-2 py-0.5 rounded-full bg-rec-soft-primary text-rec-primary font-bold">
                   {t("register.search.badge")}
                 </span>
               </button>
@@ -315,7 +315,7 @@ export function RegistrationCard({
         <button
           type="button"
           onClick={clearPatient}
-          className="mr-auto bg-transparent border border-rec-primary/30 rounded-lg px-2.5 py-1 text-[0.76rem] text-rec-primary cursor-pointer"
+          className="me-auto bg-transparent border border-rec-primary/30 rounded-lg px-2.5 py-1 text-[0.76rem] text-rec-primary cursor-pointer"
         >
           {t("register.selected.cancel")}
         </button>

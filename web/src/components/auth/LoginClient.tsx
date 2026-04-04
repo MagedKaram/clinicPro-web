@@ -122,7 +122,7 @@ export function LoginClient() {
         <div className="text-xl font-black text-rec-primary">{t("title")}</div>
         <div className="mt-2 text-rec-muted">{t("subtitle")}</div>
 
-        <form onSubmit={handleSubmit} className="mt-6 text-right">
+        <form onSubmit={handleSubmit} className="mt-6 text-start">
           <div className="mb-4">
             <InputLabel>{t("fields.email")}</InputLabel>
             <TextInput
@@ -149,7 +149,7 @@ export function LoginClient() {
           </div>
 
           {/* Forgot password link */}
-          <div className="mb-3 text-right">
+          <div className="mb-3 text-start">
             <Link
               href={`/${locale}/forgot-password`}
               className="text-[0.82rem] text-rec-muted hover:text-rec-primary transition-colors"
@@ -159,7 +159,7 @@ export function LoginClient() {
           </div>
 
           {error ? (
-            <div className="mt-3 text-[0.85rem] text-danger text-right">
+            <div className="mt-3 text-[0.85rem] text-danger text-start">
               {error}
             </div>
           ) : null}

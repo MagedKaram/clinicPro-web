@@ -27,7 +27,7 @@ export default async function RootLayout({
     <html lang={locale} dir={dirForLocale(locale)} className="h-full antialiased">
       <body
         suppressHydrationWarning
-        className="min-h-full flex flex-col font-sans bg-rec-bg text-rec-text"
+        className="min-h-full flex flex-col font-sans bg-doc-bg text-rec-text"
       >
         {children}
       </body>

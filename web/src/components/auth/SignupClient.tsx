@@ -315,7 +315,7 @@ export function SignupClient({ isClinicOnly = false }: Props) {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-5 text-right">
+        <form onSubmit={handleSubmit} className="mt-5 text-start">
           {/* ── Step 1: Account info ── */}
           {step === 1 && (
             <>
@@ -484,7 +484,7 @@ export function SignupClient({ isClinicOnly = false }: Props) {
           )}
 
           {emailExists && (
-            <div className="mt-3 p-3 rounded-xl bg-rec-bg border border-rec-border text-[0.85rem] text-rec-text text-right">
+            <div className="mt-3 p-3 rounded-xl bg-rec-bg border border-rec-border text-[0.85rem] text-rec-text text-start">
               {t("errors.emailAlreadyExists")}{" "}
               <Link href={`/${locale}/login`} className="font-bold text-rec-primary hover:underline">
                 {t("cta.backToLogin")}
@@ -493,13 +493,13 @@ export function SignupClient({ isClinicOnly = false }: Props) {
           )}
 
           {info && (
-            <div className="mt-3 p-3 rounded-xl bg-success-soft text-[0.85rem] text-success text-right">
+            <div className="mt-3 p-3 rounded-xl bg-success-soft text-[0.85rem] text-success text-start">
               {info}
             </div>
           )}
 
           {error && (
-            <div className="mt-3 text-[0.85rem] text-danger text-right">{error}</div>
+            <div className="mt-3 text-[0.85rem] text-danger text-start">{error}</div>
           )}
 
           {!info && !emailExists && (

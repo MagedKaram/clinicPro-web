@@ -99,7 +99,7 @@ export default async function ClinicStatusPage({
             </div>
             <div className="mt-2 text-rec-muted">{t("rejected.subtitle")}</div>
             {rejectionReason ? (
-              <div className="mt-3 text-[0.85rem] text-rec-text bg-rec-bg border border-rec-border rounded-xl p-3 text-right">
+              <div className="mt-3 text-[0.85rem] text-rec-text bg-rec-bg border border-rec-border rounded-xl p-3 text-start">
                 {t("rejected.reasonLabel", { reason: rejectionReason })}
               </div>
             ) : null}

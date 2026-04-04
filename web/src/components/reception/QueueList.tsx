@@ -87,7 +87,7 @@ export function QueueList({
               <button
                 type="button"
                 onClick={() => onOpenBilling?.(String(p.visitId))}
-                className="flex items-center gap-2.5 w-full text-left cursor-pointer"
+                className="flex items-center gap-2.5 w-full text-start cursor-pointer"
               >
                 {content}
               </button>

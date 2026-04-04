@@ -92,7 +92,7 @@ export function ResetPasswordClient() {
             {t("loading")}
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="mt-6 text-right">
+          <form onSubmit={handleSubmit} className="mt-6 text-start">
             <div className="mb-4">
               <InputLabel>{t("fields.password")}</InputLabel>
               <PasswordInput
@@ -116,14 +116,14 @@ export function ResetPasswordClient() {
                 dir="ltr"
               />
               {confirm.length > 0 && !passwordsMatch && (
-                <p className="mt-1 text-[0.8rem] text-danger text-right">
+                <p className="mt-1 text-[0.8rem] text-danger text-start">
                   {t("errors.mismatch")}
                 </p>
               )}
             </div>
 
             {error ? (
-              <div className="mt-3 text-[0.85rem] text-danger text-right">
+              <div className="mt-3 text-[0.85rem] text-danger text-start">
                 {error}
               </div>
             ) : null}

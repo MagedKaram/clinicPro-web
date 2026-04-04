@@ -36,7 +36,7 @@ export function BalanceBar({ balance, onRefresh, busy }: BalanceBarProps) {
         type="button"
         onClick={onRefresh}
         disabled={Boolean(busy)}
-        className="mr-auto bg-transparent border border-warning rounded-lg px-2.5 py-0.5 text-[0.76rem] text-warning-ink-strong cursor-pointer"
+        className="me-auto bg-transparent border border-warning rounded-lg px-2.5 py-0.5 text-[0.76rem] text-warning-ink-strong cursor-pointer"
       >
         {t("balanceBar.refresh")}
       </button>

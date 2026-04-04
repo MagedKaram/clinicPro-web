@@ -95,25 +95,25 @@ export function ReportPanel({
           <table className="w-full border-collapse">
             <thead>
               <tr>
-                <th className="bg-rec-primary text-rec-card px-3 py-2 text-right text-[0.8rem] font-bold rounded-tr-lg">
+                <th className="bg-rec-primary text-rec-card px-3 py-2 text-start text-[0.8rem] font-bold rounded-ss-lg">
                   {t("report.table.colIndex")}
                 </th>
-                <th className="bg-rec-primary text-rec-card px-3 py-2 text-right text-[0.8rem] font-bold">
+                <th className="bg-rec-primary text-rec-card px-3 py-2 text-start text-[0.8rem] font-bold">
                   {t("report.table.colName")}
                 </th>
-                <th className="bg-rec-primary text-rec-card px-3 py-2 text-right text-[0.8rem] font-bold">
+                <th className="bg-rec-primary text-rec-card px-3 py-2 text-start text-[0.8rem] font-bold">
                   {t("report.table.colType")}
                 </th>
-                <th className="bg-rec-primary text-rec-card px-3 py-2 text-right text-[0.8rem] font-bold">
+                <th className="bg-rec-primary text-rec-card px-3 py-2 text-start text-[0.8rem] font-bold">
                   {t("report.table.colDiagnosis")}
                 </th>
-                <th className="bg-rec-primary text-rec-card px-3 py-2 text-right text-[0.8rem] font-bold">
+                <th className="bg-rec-primary text-rec-card px-3 py-2 text-start text-[0.8rem] font-bold">
                   {t("report.table.colPrice")}
                 </th>
-                <th className="bg-rec-primary text-rec-card px-3 py-2 text-right text-[0.8rem] font-bold">
+                <th className="bg-rec-primary text-rec-card px-3 py-2 text-start text-[0.8rem] font-bold">
                   {t("report.table.colPaid")}
                 </th>
-                <th className="bg-rec-primary text-rec-card px-3 py-2 text-right text-[0.8rem] font-bold rounded-tl-lg">
+                <th className="bg-rec-primary text-rec-card px-3 py-2 text-start text-[0.8rem] font-bold rounded-se-lg">
                   {t("report.table.colRemaining")}
                 </th>
               </tr>

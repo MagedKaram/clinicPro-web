@@ -163,7 +163,7 @@ export function MedicalHistoryPopup({
                               prev === v.id ? null : v.id,
                             )
                           }
-                          className="w-full text-left px-4 py-3 flex items-center gap-3 cursor-pointer"
+                          className="w-full text-start px-4 py-3 flex items-center gap-3 cursor-pointer"
                         >
                           <div className="text-[0.88rem] font-bold text-doc-accent whitespace-nowrap">
                             📅 {formatVisitDate(v.date, locale)}

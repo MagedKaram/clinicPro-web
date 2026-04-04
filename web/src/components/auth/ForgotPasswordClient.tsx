@@ -65,11 +65,11 @@ export function ForgotPasswordClient() {
         <div className="mt-2 text-rec-muted">{t("subtitle")}</div>
 
         {sent ? (
-          <div className="mt-6 p-4 rounded-xl bg-success-soft text-success text-[0.9rem] text-right leading-relaxed">
+          <div className="mt-6 p-4 rounded-xl bg-success-soft text-success text-[0.9rem] text-start leading-relaxed">
             📧 {t("success")}
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="mt-6 text-right">
+          <form onSubmit={handleSubmit} className="mt-6 text-start">
             <div className="mb-4">
               <InputLabel>{t("fields.email")}</InputLabel>
               <TextInput
@@ -84,7 +84,7 @@ export function ForgotPasswordClient() {
             </div>
 
             {error ? (
-              <div className="mt-2 text-[0.85rem] text-danger text-right">
+              <div className="mt-2 text-[0.85rem] text-danger text-start">
                 {error}
               </div>
             ) : null}

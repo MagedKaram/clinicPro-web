@@ -26,7 +26,7 @@ export function DisplayTopbar({
       </div>
 
       <div
-        className="text-[0.85rem] text-dis-muted text-left"
+        className="text-[0.85rem] text-dis-muted text-start"
         suppressHydrationWarning
       >
         {dateText}

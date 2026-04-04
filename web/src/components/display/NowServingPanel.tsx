@@ -10,7 +10,7 @@ export function NowServingPanel({ currentNumber }: NowServingPanelProps) {
   const t = useTranslations("display");
 
   return (
-    <div className="flex flex-col items-center justify-center px-11 py-12 border-l border-dis-border relative">
+    <div className="flex flex-col items-center justify-center px-11 py-12 border-s border-dis-border relative">
       <div className="absolute inset-10 rounded-[30px] pointer-events-none bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--dis-accent)_6%,transparent)_0%,transparent_70%)]" />
 
       <div className="relative flex items-center gap-2 text-[0.82rem] uppercase tracking-[4px] text-dis-muted mb-4">
